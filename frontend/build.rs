@@ -24,8 +24,12 @@ fn main() {
     // Axum version from server
     println!("cargo:rustc-env=AXUM_VERSION=0.7");
 
-    // Rerun if Cargo.toml changes
+    // Load theme configuration
+    load_theme_config();
+
+    // Rerun if files change
     println!("cargo:rerun-if-changed=Cargo.toml");
+    println!("cargo:rerun-if-changed=theme.toml");
 }
 
 fn extract_version(line: &str) -> Option<String> {
@@ -45,4 +49,28 @@ fn extract_version(line: &str) -> Option<String> {
         }
     }
     None
+}
+
+fn load_theme_config() {
+    let theme_content = fs::read_to_string("theme.toml").expect("Failed to read theme.toml");
+    let theme: toml::Value = toml::from_str(&theme_content).expect("Failed to parse theme.toml");
+
+    // Extract color values
+    let colors = theme
+        .get("colors")
+        .and_then(|c| c.as_table())
+        .expect("Missing [colors] section in theme.toml");
+
+    // Set environment variables for each color
+    for (name, value) in colors {
+        if let Some(rgb_array) = value.as_array()
+            && rgb_array.len() == 3
+        {
+            let r = rgb_array[0].as_integer().expect("Invalid RGB value") as u8;
+            let g = rgb_array[1].as_integer().expect("Invalid RGB value") as u8;
+            let b = rgb_array[2].as_integer().expect("Invalid RGB value") as u8;
+            let env_name = format!("THEME_COLOR_{}", name.to_uppercase());
+            println!("cargo:rustc-env={}={},{},{}", env_name, r, g, b);
+        }
+    }
 }
