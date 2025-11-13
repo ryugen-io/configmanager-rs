@@ -19,9 +19,8 @@ pub fn handle_keys(state: &mut AppState, state_rc: &Rc<RefCell<AppState>>, key_e
                 match selected.as_str() {
                     "Config Files" => {
                         state.focus = Pane::FileList;
-                        if state.file_list.files.is_empty() {
-                            refresh::refresh_pane(Pane::FileList, state_rc);
-                        }
+                        // Always refresh to get latest files from server
+                        refresh::refresh_pane(Pane::FileList, state_rc);
                     }
                     "Container" => {
                         state.focus = Pane::ContainerList;

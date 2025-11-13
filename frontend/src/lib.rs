@@ -42,11 +42,14 @@ pub fn main() -> Result<(), JsValue> {
                 spawn_local(async move {
                     match api::fetch_file_list().await {
                         Ok(files) => {
+                            // Save to cache for next session
+                            storage::generic::save("file-list", &files);
                             let mut st = state_clone.borrow_mut();
                             st.file_list.set_files(files);
                             st.set_status("Restored session");
                         }
                         Err(e) => {
+                            storage::generic::clear("file-list");
                             state::status_helper::set_status_timed(
                                 &state_clone,
                                 format!("Error loading files: {:?}", e),
