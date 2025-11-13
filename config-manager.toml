@@ -29,4 +29,13 @@ path = "/home/pl/.config/hypr/hyprland.conf"
 name = "hyprland.conf"
 description = "Hyprland configuration"
 
-# You can add more files here!
+# Directory scanning example
+# Scans a directory recursively and includes files matching specific types
+[[directories]]
+path = "~/.config/hypr"
+name = "hypr"
+depth = 3
+types = ["conf", "txt", "sh"]
+description = "Hyprland config directory"
+
+# You can add more files and directories here!
