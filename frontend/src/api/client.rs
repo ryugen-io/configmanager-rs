@@ -17,6 +17,19 @@ struct WriteConfigRequest {
     content: String,
 }
 
+#[derive(Deserialize, Clone)]
+pub struct ContainerInfo {
+    pub id: String,
+    pub name: String,
+    pub state: String,
+    pub status: String,
+}
+
+#[derive(Deserialize)]
+struct ContainerListResponse {
+    containers: Vec<ContainerInfo>,
+}
+
 pub async fn fetch_file_list() -> Result<Vec<String>, JsValue> {
     let response = Request::get("/api/configs")
         .send()
@@ -79,4 +92,25 @@ pub async fn save_file_content(filename: &str, content: String) -> Result<(), Js
     }
 
     Ok(())
+}
+
+pub async fn fetch_container_list() -> Result<Vec<ContainerInfo>, JsValue> {
+    let response = Request::get("/api/containers")
+        .send()
+        .await
+        .map_err(|e| JsValue::from_str(&format!("Failed to fetch containers: {}", e)))?;
+
+    if !response.ok() {
+        return Err(JsValue::from_str(&format!(
+            "Server returned error: {}",
+            response.status()
+        )));
+    }
+
+    let data: ContainerListResponse = response
+        .json()
+        .await
+        .map_err(|e| JsValue::from_str(&format!("Failed to parse JSON: {}", e)))?;
+
+    Ok(data.containers)
 }

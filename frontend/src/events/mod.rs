@@ -1,3 +1,4 @@
+mod container_list;
 mod editor;
 mod file_list;
 mod menu;
@@ -41,6 +42,7 @@ pub fn handle_key_event(state: Rc<RefCell<AppState>>, key_event: KeyEvent) {
         Pane::Menu => menu::handle_keys(&mut state_mut, &state, key_event),
         Pane::FileList => file_list::handle_keys(&mut state_mut, &state, key_event),
         Pane::Editor => editor::handle_keys(&mut state_mut, key_event),
+        Pane::ContainerList => container_list::handle_keys(&mut state_mut, key_event),
     }
 
     // Save state after any key event

@@ -58,6 +58,7 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         (Pane::FileList, _) => " | j/k:navigate Enter:load ESC:menu Ctrl-→:editor",
         (Pane::Editor, VimMode::Normal) => " | i:insert F2:save Ctrl-←:files",
         (Pane::Editor, VimMode::Insert) => " | ESC:normal F2:save",
+        (Pane::ContainerList, _) => " | j/k:navigate ESC/Ctrl-←:menu",
     };
     spans.push(Span::styled(help_text, Style::default().fg(Theme::DIM)));
 

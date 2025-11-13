@@ -1,3 +1,4 @@
+mod container_list;
 mod editor;
 mod file_list;
 mod menu;
@@ -30,6 +31,7 @@ pub fn render(f: &mut Frame, state: &AppState) {
     // Main content depends on current pane
     match state.focus {
         Pane::Menu => menu::render(f, state, chunks[0]),
+        Pane::ContainerList => container_list::render(f, state, chunks[0]),
         _ => render_main_content(f, state, chunks[0]),
     }
 

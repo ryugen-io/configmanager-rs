@@ -15,6 +15,7 @@ async fn main() {
         .route("/api/configs", get(routes::list_configs))
         .route("/api/configs/:filename", get(routes::read_config))
         .route("/api/configs/:filename", post(routes::write_config))
+        .route("/api/containers", get(routes::list_containers))
         // Static files (frontend)
         .nest_service("/", ServeDir::new("frontend/dist"));
 
@@ -25,6 +26,7 @@ async fn main() {
     println!("  GET  /api/configs");
     println!("  GET  /api/configs/:filename");
     println!("  POST /api/configs/:filename");
+    println!("  GET  /api/containers");
 
     axum::serve(listener, app).await.unwrap();
 }

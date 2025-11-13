@@ -36,7 +36,24 @@ pub fn handle_keys(state: &mut AppState, state_rc: &Rc<RefCell<AppState>>, key_e
                         }
                     }
                     "Container" => {
-                        state.set_status("Container management not implemented yet");
+                        state.focus = Pane::ContainerList;
+                        // Fetch container list if empty
+                        if state.container_list.containers.is_empty() {
+                            let state_clone = Rc::clone(state_rc);
+                            spawn_local(async move {
+                                match api::fetch_container_list().await {
+                                    Ok(containers) => {
+                                        let mut st = state_clone.borrow_mut();
+                                        st.container_list.set_containers(containers);
+                                        st.set_status("Loaded container list");
+                                    }
+                                    Err(e) => {
+                                        let mut st = state_clone.borrow_mut();
+                                        st.set_status(format!("Error loading containers: {:?}", e));
+                                    }
+                                }
+                            });
+                        }
                     }
                     _ => {}
                 }

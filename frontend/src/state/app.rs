@@ -1,4 +1,4 @@
-use super::{EditorState, FileListState, MenuState};
+use super::{ContainerListState, EditorState, FileListState, MenuState};
 use crate::storage;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -6,6 +6,7 @@ pub enum Pane {
     Menu,
     FileList,
     Editor,
+    ContainerList,
 }
 
 impl Pane {
@@ -14,6 +15,7 @@ impl Pane {
             Pane::Menu => "Menu",
             Pane::FileList => "FileList",
             Pane::Editor => "Editor",
+            Pane::ContainerList => "ContainerList",
         }
     }
 
@@ -22,6 +24,7 @@ impl Pane {
             "Menu" => Some(Pane::Menu),
             "FileList" => Some(Pane::FileList),
             "Editor" => Some(Pane::Editor),
+            "ContainerList" => Some(Pane::ContainerList),
             _ => None,
         }
     }
@@ -38,6 +41,7 @@ pub struct AppState {
     pub vim_mode: VimMode,
     pub menu: MenuState,
     pub file_list: FileListState,
+    pub container_list: ContainerListState,
     pub editor: EditorState,
     pub dirty: bool,
     pub status_message: Option<String>,
@@ -50,6 +54,7 @@ impl AppState {
             vim_mode: VimMode::Normal,
             menu: MenuState::new(),
             file_list: FileListState::new(),
+            container_list: ContainerListState::new(),
             editor: EditorState::new(),
             dirty: false,
             status_message: None,
