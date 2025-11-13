@@ -1,0 +1,32 @@
+# Rust
+/target/
+**/target/
+**/*.rs.bk
+*.pdb
+
+# Trunk (WASM build artifacts)
+/frontend/dist/
+/frontend/pkg/
+**/dist/
+**/pkg/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Editor backups
+*.backup-*
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS
+Thumbs.db

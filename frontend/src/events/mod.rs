@@ -1,0 +1,43 @@
+mod editor;
+mod file_list;
+mod menu;
+
+use crate::state::{AppState, Pane};
+use ratzilla::event::{KeyCode, KeyEvent};
+use std::{cell::RefCell, rc::Rc};
+
+pub fn handle_key_event(state: Rc<RefCell<AppState>>, key_event: KeyEvent) {
+    let mut state_mut = state.borrow_mut();
+
+    // Global keybindings (work in any pane/mode)
+
+    // F2: Save file
+    if key_event.code == KeyCode::F(2) {
+        if let Some(filename) = state_mut.editor.current_file.clone() {
+            let content = state_mut.editor.get_content();
+            drop(state_mut); // Release borrow before async
+
+            menu::save_file(state, filename, content);
+        }
+        return;
+    }
+
+    // Ctrl+Left: Focus file list
+    if key_event.ctrl && key_event.code == KeyCode::Left {
+        state_mut.focus = Pane::FileList;
+        return;
+    }
+
+    // Ctrl+Right: Focus editor
+    if key_event.ctrl && key_event.code == KeyCode::Right {
+        state_mut.focus = Pane::Editor;
+        state_mut.vim_mode = crate::state::VimMode::Normal;
+        return;
+    }
+
+    match state_mut.focus {
+        Pane::Menu => menu::handle_keys(&mut state_mut, &state, key_event),
+        Pane::FileList => file_list::handle_keys(&mut state_mut, &state, key_event),
+        Pane::Editor => editor::handle_keys(&mut state_mut, key_event),
+    }
+}
