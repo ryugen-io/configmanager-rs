@@ -4,7 +4,6 @@ mod state;
 mod storage;
 mod theme;
 mod ui;
-mod version;
 
 use ratzilla::{DomBackend, WebRenderer};
 use state::{AppState, Pane};

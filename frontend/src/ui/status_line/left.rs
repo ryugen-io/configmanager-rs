@@ -4,25 +4,13 @@ use crate::{
 };
 use ratzilla::ratatui::{
     Frame,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Rect},
     style::{Modifier, Style},
     text::{Line, Span},
     widgets::Paragraph,
 };
 
 pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
-    // Split status line into left and right sections
-    // Right needs more space for build date + tech stack
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(55), Constraint::Percentage(45)])
-        .split(area);
-
-    render_left(f, state, chunks[0]);
-    render_right(f, chunks[1]);
-}
-
-fn render_left(f: &mut Frame, state: &AppState, area: Rect) {
     let mode_text = match state.vim_mode {
         VimMode::Normal => "NORMAL",
         VimMode::Insert => "INSERT",
@@ -78,17 +66,4 @@ fn render_left(f: &mut Frame, state: &AppState, area: Rect) {
         .alignment(Alignment::Left);
 
     f.render_widget(status_line, area);
-}
-
-fn render_right(f: &mut Frame, area: Rect) {
-    let tech_info = crate::version::tech_stack_info();
-
-    let tech_line = Paragraph::new(Line::from(Span::styled(
-        format!("{} ", tech_info),
-        Style::default().fg(Theme::DIM),
-    )))
-    .style(Style::default().bg(Theme::MANTLE))
-    .alignment(Alignment::Right);
-
-    f.render_widget(tech_line, area);
 }
