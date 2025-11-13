@@ -1,3 +1,4 @@
+pub mod generic;
 mod local;
 mod types;
 

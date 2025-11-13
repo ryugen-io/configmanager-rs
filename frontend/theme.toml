@@ -12,6 +12,7 @@ peach = [245, 169, 127]     # Orange
 text = [202, 211, 245]      # Main text
 subtext0 = [165, 173, 203]  # Dimmed text
 overlay1 = [128, 135, 162]  # Medium dimmed
+surface1 = [49, 50, 68]     # Highlight background (darker)
 mantle = [30, 32, 48]       # Darker background
 
 [semantic]

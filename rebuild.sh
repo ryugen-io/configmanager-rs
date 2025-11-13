@@ -1,19 +1,33 @@
 #!/bin/bash
-# Rebuild script for Config Manager frontend
-# Run this after modifying theme.toml
+# Rebuild script for Config Manager
+# Performs full build cycle: format, build backend and frontend
 
 set -e
 
 cd "$(dirname "$0")"
 
-echo "🎨 Rebuilding Config Manager with custom theme..."
+echo "[INFO] Rebuilding Config Manager..."
 echo ""
+
+# Format code
+echo "[INFO] Formatting code..."
+cargo fmt --all
+
+# Build backend with auditable
+echo "[INFO] Building backend with cargo-auditable..."
+cargo auditable build --release
 
 # Build frontend
 cd frontend
-echo "📦 Building WASM frontend with Trunk..."
+echo "[INFO] Formatting frontend..."
+cargo fmt
+
+echo "[INFO] Building WASM frontend with Trunk..."
 trunk build --release
 
+cd ..
+
 echo ""
-echo "✅ Rebuild complete!"
-echo "🌐 Refresh your browser at http://10.1.1.30:3000 to see changes"
+echo "[OK] Rebuild complete!"
+echo "[INFO] Backend built with audit metadata"
+echo "[INFO] Refresh your browser at http://10.1.1.30:3000 to see changes"

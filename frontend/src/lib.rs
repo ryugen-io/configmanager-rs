@@ -19,36 +19,49 @@ pub fn main() -> Result<(), JsValue> {
     // Initialize app state
     let app_state = Rc::new(RefCell::new(AppState::new()));
 
+    // Load cached lists from storage
+    state::refresh::load_pane_cache(Pane::FileList, &mut app_state.borrow_mut());
+    state::refresh::load_pane_cache(Pane::ContainerList, &mut app_state.borrow_mut());
+
     // Initialize Ratzilla backend and terminal
     let backend = DomBackend::new().map_err(|e| JsValue::from_str(&e.to_string()))?;
     let terminal =
         ratzilla::ratatui::Terminal::new(backend).map_err(|e| JsValue::from_str(&e.to_string()))?;
 
-    // Show welcome message and load file list if needed
+    // Show welcome message and load data based on restored pane
     {
         let state = app_state.borrow();
-        let should_load_files = state.focus != Pane::Menu;
+        let current_pane = state.focus;
         drop(state);
 
-        if should_load_files {
-            // Load file list if we restored to FileList or Editor
-            let state_clone = Rc::clone(&app_state);
-            spawn_local(async move {
-                match api::fetch_file_list().await {
-                    Ok(files) => {
-                        let mut st = state_clone.borrow_mut();
-                        st.file_list.set_files(files);
-                        st.set_status("Restored session");
+        match current_pane {
+            Pane::FileList | Pane::Editor => {
+                // Load file list if we restored to FileList or Editor
+                let state_clone = Rc::clone(&app_state);
+                spawn_local(async move {
+                    match api::fetch_file_list().await {
+                        Ok(files) => {
+                            let mut st = state_clone.borrow_mut();
+                            st.file_list.set_files(files);
+                            st.set_status("Restored session");
+                        }
+                        Err(e) => {
+                            let mut st = state_clone.borrow_mut();
+                            st.set_status(format!("Error loading files: {:?}", e));
+                        }
                     }
-                    Err(e) => {
-                        let mut st = state_clone.borrow_mut();
-                        st.set_status(format!("Error loading files: {:?}", e));
-                    }
-                }
-            });
-        } else {
-            let mut state = app_state.borrow_mut();
-            state.set_status("Welcome to Config Manager");
+                });
+            }
+            Pane::ContainerList => {
+                // Load container list if we restored to ContainerList
+                state::refresh::refresh_pane(Pane::ContainerList, &app_state);
+                let mut state = app_state.borrow_mut();
+                state.set_status("Restored session");
+            }
+            Pane::Menu => {
+                let mut state = app_state.borrow_mut();
+                state.set_status("Welcome to Config Manager");
+            }
         }
     }
 

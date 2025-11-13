@@ -1,5 +1,7 @@
-use crate::api;
-use crate::state::{AppState, Pane};
+use crate::{
+    api,
+    state::{AppState, Pane, refresh},
+};
 use ratzilla::event::{KeyCode, KeyEvent};
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen_futures::spawn_local;
@@ -17,43 +19,13 @@ pub fn handle_keys(state: &mut AppState, state_rc: &Rc<RefCell<AppState>>, key_e
                 match selected.as_str() {
                     "Config Files" => {
                         state.focus = Pane::FileList;
-                        // Fetch file list if empty
                         if state.file_list.files.is_empty() {
-                            let state_clone = Rc::clone(state_rc);
-                            spawn_local(async move {
-                                match api::fetch_file_list().await {
-                                    Ok(files) => {
-                                        let mut st = state_clone.borrow_mut();
-                                        st.file_list.set_files(files);
-                                        st.set_status("Loaded file list");
-                                    }
-                                    Err(e) => {
-                                        let mut st = state_clone.borrow_mut();
-                                        st.set_status(format!("Error loading files: {:?}", e));
-                                    }
-                                }
-                            });
+                            refresh::refresh_pane(Pane::FileList, state_rc);
                         }
                     }
                     "Container" => {
                         state.focus = Pane::ContainerList;
-                        // Fetch container list if empty
-                        if state.container_list.containers.is_empty() {
-                            let state_clone = Rc::clone(state_rc);
-                            spawn_local(async move {
-                                match api::fetch_container_list().await {
-                                    Ok(containers) => {
-                                        let mut st = state_clone.borrow_mut();
-                                        st.container_list.set_containers(containers);
-                                        st.set_status("Loaded container list");
-                                    }
-                                    Err(e) => {
-                                        let mut st = state_clone.borrow_mut();
-                                        st.set_status(format!("Error loading containers: {:?}", e));
-                                    }
-                                }
-                            });
-                        }
+                        refresh::refresh_pane(Pane::ContainerList, state_rc);
                     }
                     _ => {}
                 }

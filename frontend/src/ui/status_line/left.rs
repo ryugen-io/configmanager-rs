@@ -1,47 +1,33 @@
 use crate::{
     state::{AppState, Pane, VimMode},
-    theme::Theme,
+    theme::status_line::StatusLineTheme,
 };
 use ratzilla::ratatui::{
     Frame,
     layout::{Alignment, Rect},
-    style::{Modifier, Style},
     text::{Line, Span},
     widgets::Paragraph,
 };
 
 pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
-    let mode_text = match state.vim_mode {
-        VimMode::Normal => "NORMAL",
-        VimMode::Insert => "INSERT",
-    };
+    let mode_text = StatusLineTheme::mode_text(state.vim_mode);
+    let mode_style = StatusLineTheme::mode_style(state.vim_mode);
 
-    let mode_color = match state.vim_mode {
-        VimMode::Normal => Theme::NORMAL_MODE,
-        VimMode::Insert => Theme::INSERT_MODE,
-    };
-
-    let mut spans = vec![Span::styled(
-        format!(" {} ", mode_text),
-        Style::default().fg(mode_color).add_modifier(Modifier::BOLD),
-    )];
+    let mut spans = vec![Span::styled(format!(" {} ", mode_text), mode_style)];
 
     // Only show file info when not in Menu
     if state.focus != Pane::Menu {
         spans.push(Span::raw(" | "));
         if let Some(filename) = &state.editor.current_file {
-            spans.push(Span::styled(filename, Style::default().fg(Theme::TEXT)));
+            spans.push(Span::styled(filename, StatusLineTheme::filename_style()));
             if state.dirty {
                 spans.push(Span::styled(
                     " [modified]",
-                    Style::default().fg(Theme::MODIFIED),
+                    StatusLineTheme::modified_style(),
                 ));
             }
         } else {
-            spans.push(Span::styled(
-                "No file",
-                Style::default().fg(Theme::SUBTEXT0),
-            ));
+            spans.push(Span::styled("No file", StatusLineTheme::no_file_style()));
         }
     }
 
@@ -50,7 +36,7 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         && let Some(ref msg) = state.status_message
     {
         spans.push(Span::raw(" | "));
-        spans.push(Span::styled(msg, Style::default().fg(Theme::SUCCESS)));
+        spans.push(Span::styled(msg, StatusLineTheme::status_message_style()));
     }
 
     let help_text = match (state.focus, state.vim_mode) {
@@ -60,10 +46,10 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         (Pane::Editor, VimMode::Insert) => " | ESC:normal F2:save",
         (Pane::ContainerList, _) => " | j/k:navigate ESC/Ctrl-←:menu",
     };
-    spans.push(Span::styled(help_text, Style::default().fg(Theme::DIM)));
+    spans.push(Span::styled(help_text, StatusLineTheme::help_text_style()));
 
     let status_line = Paragraph::new(Line::from(spans))
-        .style(Style::default().bg(Theme::MANTLE))
+        .style(StatusLineTheme::background())
         .alignment(Alignment::Left);
 
     f.render_widget(status_line, area);

@@ -17,7 +17,7 @@ struct WriteConfigRequest {
     content: String,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ContainerInfo {
     pub id: String,
     pub name: String,

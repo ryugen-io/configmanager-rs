@@ -1,11 +1,10 @@
 use crate::{
     state::{AppState, Pane},
-    theme::Theme,
+    theme::file_list::FileListTheme,
 };
 use ratzilla::ratatui::{
     Frame,
     layout::Rect,
-    style::{Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem},
 };
@@ -14,9 +13,9 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
     let is_focused = state.focus == Pane::FileList;
 
     let border_style = if is_focused {
-        Style::default().fg(Theme::ACCENT)
+        FileListTheme::border_focused()
     } else {
-        Style::default().fg(Theme::OVERLAY1)
+        FileListTheme::border_unfocused()
     };
 
     let items: Vec<ListItem> = state
@@ -25,18 +24,18 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         .iter()
         .enumerate()
         .map(|(i, file)| {
-            let style = if i == state.file_list.selected_index {
-                Style::default()
-                    .fg(Theme::SELECTED)
-                    .add_modifier(Modifier::BOLD)
+            let is_selected = i == state.file_list.selected_index;
+
+            let style = if is_selected {
+                FileListTheme::selected_item_style()
             } else {
-                Style::default().fg(Theme::TEXT)
+                FileListTheme::normal_item_style()
             };
 
-            let prefix = if i == state.file_list.selected_index {
-                "> "
+            let prefix = if is_selected {
+                FileListTheme::selected_prefix()
             } else {
-                "  "
+                FileListTheme::normal_prefix()
             };
 
             ListItem::new(Line::from(vec![Span::styled(

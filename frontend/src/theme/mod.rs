@@ -1,3 +1,9 @@
+pub mod container_list;
+pub mod editor;
+pub mod file_list;
+pub mod menu;
+pub mod status_line;
+
 use ratzilla::ratatui::style::Color;
 
 // Theme colors loaded from theme.toml at build time
@@ -49,6 +55,7 @@ impl Theme {
     pub const TEXT: Color = rgb_from_env!("THEME_COLOR_TEXT");
     pub const SUBTEXT0: Color = rgb_from_env!("THEME_COLOR_SUBTEXT0");
     pub const OVERLAY1: Color = rgb_from_env!("THEME_COLOR_OVERLAY1");
+    pub const SURFACE1: Color = rgb_from_env!("THEME_COLOR_SURFACE1");
     pub const MANTLE: Color = rgb_from_env!("THEME_COLOR_MANTLE");
 
     // Semantic colors (mapped to base colors)

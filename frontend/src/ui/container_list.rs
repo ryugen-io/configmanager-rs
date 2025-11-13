@@ -1,11 +1,10 @@
 use crate::{
     state::{AppState, Pane},
-    theme::Theme,
+    theme::container_list::ContainerListTheme,
 };
 use ratzilla::ratatui::{
     Frame,
     layout::Rect,
-    style::{Modifier, Style},
     text::Line,
     widgets::{Block, Borders, List, ListItem, ListState},
 };
@@ -18,29 +17,25 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         .containers
         .iter()
         .map(|container| {
-            let status_color = match container.state.as_str() {
-                "running" => Theme::GREEN,
-                "exited" => Theme::OVERLAY1,
-                _ => Theme::YELLOW,
-            };
+            let status_color = ContainerListTheme::status_color(&container.state);
 
             let short_id = &container.id[..12.min(container.id.len())];
             let line = Line::from(vec![
                 ratzilla::ratatui::text::Span::styled(
                     format!("{:<12} ", short_id),
-                    Style::default().fg(Theme::YELLOW),
+                    ContainerListTheme::id_style(),
                 ),
                 ratzilla::ratatui::text::Span::styled(
                     format!("{:<15} ", container.name),
-                    Style::default().fg(Theme::TEXT),
+                    ContainerListTheme::name_style(),
                 ),
                 ratzilla::ratatui::text::Span::styled(
                     format!("[{}] ", container.state),
-                    Style::default().fg(status_color),
+                    ratzilla::ratatui::style::Style::default().fg(status_color),
                 ),
                 ratzilla::ratatui::text::Span::styled(
                     &container.status,
-                    Style::default().fg(Theme::SUBTEXT0),
+                    ContainerListTheme::status_info_style(),
                 ),
             ]);
 
@@ -49,9 +44,9 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         .collect();
 
     let border_style = if is_focused {
-        Style::default().fg(Theme::ACCENT)
+        ContainerListTheme::border_focused()
     } else {
-        Style::default().fg(Theme::OVERLAY1)
+        ContainerListTheme::border_unfocused()
     };
 
     let block = Block::default()
@@ -59,11 +54,9 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         .title(" Containers ")
         .border_style(border_style);
 
-    let list = List::new(items).block(block).highlight_style(
-        Style::default()
-            .bg(Theme::ACCENT)
-            .add_modifier(Modifier::BOLD),
-    );
+    let list = List::new(items)
+        .block(block)
+        .highlight_style(ContainerListTheme::highlight_style());
 
     let mut list_state = ListState::default();
     list_state.select(Some(state.container_list.selected_index));

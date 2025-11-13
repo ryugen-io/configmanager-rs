@@ -1,8 +1,7 @@
-use crate::{state::AppState, theme::Theme};
+use crate::{state::AppState, theme::menu::MenuTheme};
 use ratzilla::ratatui::{
     Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
 };
@@ -32,29 +31,24 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
     // Build menu content
     let mut lines = vec![
         Line::from(""),
-        Line::from(Span::styled(
-            "CONFIG MANAGER",
-            Style::default()
-                .fg(Theme::ACCENT)
-                .add_modifier(Modifier::BOLD),
-        )),
+        Line::from(Span::styled("CONFIG MANAGER", MenuTheme::title_style())),
         Line::from(""),
         Line::from(""),
     ];
 
     for (i, item) in state.menu.items.iter().enumerate() {
-        let style = if i == state.menu.selected_index {
-            Style::default()
-                .fg(Theme::SELECTED)
-                .add_modifier(Modifier::BOLD)
+        let is_selected = i == state.menu.selected_index;
+
+        let style = if is_selected {
+            MenuTheme::selected_item_style()
         } else {
-            Style::default().fg(Theme::TEXT)
+            MenuTheme::normal_item_style()
         };
 
-        let prefix = if i == state.menu.selected_index {
-            "> "
+        let prefix = if is_selected {
+            MenuTheme::selected_prefix()
         } else {
-            "  "
+            MenuTheme::normal_prefix()
         };
 
         lines.push(Line::from(Span::styled(
@@ -66,7 +60,7 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
     let menu = Paragraph::new(lines).alignment(Alignment::Center).block(
         Block::default()
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Theme::ACCENT)),
+            .border_style(MenuTheme::border_style()),
     );
 
     f.render_widget(menu, menu_area);
