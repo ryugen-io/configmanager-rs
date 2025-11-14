@@ -1,6 +1,6 @@
 mod build_helpers;
 
-use build_helpers::{date, theme, version};
+use build_helpers::{date, hash, theme, version};
 
 fn main() {
     // Extract dependency versions from Cargo.toml
@@ -8,6 +8,7 @@ fn main() {
 
     // Set build metadata
     date::set_build_date();
+    hash::set_build_hash();
 
     // Load theme configuration
     theme::load_theme_config();

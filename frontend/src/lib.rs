@@ -12,11 +12,22 @@ use state::{AppState, Pane};
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
+use web_sys::window;
 
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
     // Set up panic hook for better error messages
     console_error_panic_hook::set_once();
+
+    // Set body background color from theme
+    if let Some(win) = window()
+        && let Some(doc) = win.document()
+        && let Some(body) = doc.body()
+    {
+        let mantle_rgb = env!("THEME_COLOR_MANTLE");
+        let bg_color = format!("rgb({})", mantle_rgb);
+        let _ = body.set_attribute("style", &format!("background-color: {}", bg_color));
+    }
 
     // Initialize app state
     let app_state = Rc::new(RefCell::new(AppState::new()));

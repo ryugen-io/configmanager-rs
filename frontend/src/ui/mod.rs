@@ -45,12 +45,13 @@ fn render_main_content(f: &mut Frame, state: &AppState, area: ratzilla::ratatui:
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage(25), // File list
-            Constraint::Percentage(75), // Editor
+            Constraint::Percentage(1),  // Empty gap
+            Constraint::Percentage(74), // Editor
         ])
         .split(area);
 
     file_list::render(f, state, chunks[0]);
-    editor::render(f, state, chunks[1]);
+    editor::render(f, state, chunks[2]);
 }
 
 fn render_container_view(f: &mut Frame, state: &AppState, area: ratzilla::ratatui::layout::Rect) {
@@ -58,10 +59,11 @@ fn render_container_view(f: &mut Frame, state: &AppState, area: ratzilla::ratatu
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage(40), // Container list
-            Constraint::Percentage(60), // Container details
+            Constraint::Percentage(1),  // Empty gap
+            Constraint::Percentage(59), // Container details
         ])
         .split(area);
 
     container_list::render(f, state, chunks[0]);
-    container_details::render(f, state, chunks[1]);
+    container_details::render(f, state, chunks[2]);
 }

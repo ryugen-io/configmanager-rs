@@ -8,6 +8,7 @@ use ratzilla::ratatui::{
 
 pub fn render(f: &mut Frame, area: Rect) {
     let build_date = env!("BUILD_DATE");
+    let build_hash = env!("BUILD_HASH");
     let rust_edition = env!("RUST_EDITION");
     let rust_version = env!("RUST_VERSION");
     let ratzilla_version = env!("RATZILLA_VERSION");
@@ -17,6 +18,9 @@ pub fn render(f: &mut Frame, area: Rect) {
     let spans = vec![
         Span::styled(" last build: ", StatusLineTheme::label_style()),
         Span::styled(build_date, StatusLineTheme::value_style()),
+        Span::styled(" (", StatusLineTheme::label_style()),
+        Span::styled(build_hash, StatusLineTheme::value_style()),
+        Span::styled(")", StatusLineTheme::label_style()),
         Span::styled(" | Rust ", StatusLineTheme::label_style()),
         Span::styled(rust_version, StatusLineTheme::value_style()),
         Span::styled(" (Edition ", StatusLineTheme::label_style()),
