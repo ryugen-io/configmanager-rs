@@ -21,15 +21,64 @@
 # Editor backups
 *.backup-*
 
-# Environment
+# Environment & Secrets
 .env
-.env.local
+.env.*
+!.env.example
+!.env.template
+*.local
+secrets/
+secrets.toml
+secrets.json
+config.local.*
+
+# Credentials & Keys
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+id_ecdsa*
+*.pub
+.ssh/
+credentials
+credentials.*
+*.credentials
+auth.json
+*.token
+*.secret
+
+# Cloud Provider Credentials
+.aws/
+.azure/
+.gcloud/
+.kube/config
+gcloud-service-key.json
+service-account*.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+dump.sql
+*.sql.gz
 
 # Logs
 *.log
+logs/
+*.log.*
 
 # OS
 Thumbs.db
+.DS_Store
 
-# Server PID file
+# Server Runtime
 .server.pid
+*.pid
+*.sock
