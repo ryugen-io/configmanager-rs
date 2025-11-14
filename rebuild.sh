@@ -7,6 +7,13 @@ set -o pipefail
 
 # Configuration
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Load .env if it exists
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    set -a
+    source "$SCRIPT_DIR/.env"
+    set +a
+fi
 readonly LOG_FILE="server.log"
 readonly SERVER_PORT=3000
 readonly SERVER_HOST="${SERVER_HOST:-localhost}"

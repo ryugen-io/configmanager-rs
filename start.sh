@@ -3,6 +3,16 @@
 
 set -e
 
+# Configuration
+readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Load .env if it exists
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    set -a
+    source "$SCRIPT_DIR/.env"
+    set +a
+fi
+
 readonly PID_FILE=".server.pid"
 readonly LOG_FILE="server.log"
 readonly SERVER_PORT=3000
