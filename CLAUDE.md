@@ -404,6 +404,141 @@ pub async fn fetch_file_list() -> Result<Vec<FileInfo>, String> {
 - ID-based paths: `/api/containers/:id/details`
 - Action verbs as path segments: `/api/containers/:id/start`
 
+### Shell Script Conventions
+
+**IMPORTANT**: All shell scripts in this project follow a strict design pattern for consistency and visual appeal.
+
+#### Visual Indicators
+
+- ✅ **Use Nerd Font Icons**: All scripts use Nerd Font icons for visual indicators
+- ❌ **NO Emojis**: Never use emojis in shell scripts
+
+**Standard Icons**:
+```bash
+readonly CHECK=""   # Success indicator
+readonly CROSS=""   # Error indicator
+readonly WARN=""    # Warning indicator
+readonly INFO=""    # Info indicator
+readonly CHART="󰈙"  # Chart/metrics indicator
+readonly FILE=""    # File indicator
+```
+
+#### Color Scheme
+
+All scripts use the **Catppuccin Mocha** 24-bit true color palette:
+
+```bash
+# Catppuccin Mocha color palette (24-bit true color)
+readonly RED='\\033[38;2;243;139;168m'        # #f38ba8 - Errors
+readonly GREEN='\\033[38;2;166;227;161m'      # #a6e3a1 - Success/Info
+readonly YELLOW='\\033[38;2;249;226;175m'     # #f9e2af - Warnings
+readonly BLUE='\\033[38;2;137;180;250m'       # #89b4fa - Info highlights
+readonly MAUVE='\\033[38;2;203;166;247m'      # #cba6f7 - Headers
+readonly SAPPHIRE='\\033[38;2;116;199;236m'   # #74c7ec - Success highlights
+readonly TEXT='\\033[38;2;205;214;244m'       # #cdd6f4 - Normal text
+readonly SUBTEXT='\\033[38;2;186;194;222m'    # #bac2de - Subtext
+readonly NC='\\033[0m'                         # No Color
+```
+
+#### Standard Logging Functions
+
+Every script should implement these logging functions:
+
+```bash
+log_success() {
+    echo -e "${GREEN}${CHECK}  ${NC}$1"
+}
+
+log_error() {
+    echo -e "${RED}${CROSS}  ${NC}$1" >&2
+}
+
+log_warn() {
+    echo -e "${YELLOW}${WARN}  ${NC}$1"
+}
+
+log_info() {
+    echo -e "${BLUE}${INFO}  ${NC}$1"
+}
+```
+
+#### Tag Formatting
+
+Use consistent tag formatting for script identification:
+
+```bash
+echo -e "${MAUVE}[script-name]${NC} Doing something..."
+echo -e "${GREEN}[script-name]${NC} Success message"
+```
+
+Examples from existing scripts:
+- `[rebuild]` - rebuild.sh
+- `[start]` - start.sh
+- `[stop]` - stop.sh
+- `[lint]` - lint.sh
+- `[lines]` - lines.sh
+
+#### Error Handling
+
+All scripts must include proper error handling:
+
+```bash
+#!/bin/bash
+set -e           # Exit on error
+set -o pipefail  # Fail on pipe errors
+```
+
+#### Script Structure Template
+
+```bash
+#!/bin/bash
+# Brief description of what the script does
+
+set -e
+set -o pipefail
+
+# Catppuccin Mocha color palette
+readonly RED='\\033[38;2;243;139;168m'
+readonly GREEN='\\033[38;2;166;227;161m'
+readonly YELLOW='\\033[38;2;249;226;175m'
+readonly BLUE='\\033[38;2;137;180;250m'
+readonly MAUVE='\\033[38;2;203;166;247m'
+readonly NC='\\033[0m'
+
+# Nerd Font Icons
+readonly CHECK=""
+readonly CROSS=""
+readonly WARN=""
+
+log_success() {
+    echo -e "${GREEN}${CHECK}  ${NC}$1"
+}
+
+log_error() {
+    echo -e "${RED}${CROSS}  ${NC}$1" >&2
+}
+
+log_warn() {
+    echo -e "${YELLOW}${WARN}  ${NC}$1"
+}
+
+# Main script logic
+echo -e "${MAUVE}[script-name]${NC} Starting..."
+
+# ... your code here ...
+
+log_success "Operation completed"
+```
+
+#### Reference Scripts
+
+Follow the patterns established in:
+- `rebuild.sh:1` - Main build script (comprehensive example)
+- `start.sh:1` - Server startup
+- `stop.sh:1` - Server shutdown
+- `lines.sh:1` - Code metrics
+- `lint.sh:1` - Shell script linting
+
 ---
 
 ## Testing Guidelines
@@ -654,17 +789,108 @@ let main_chunks = Layout::default()
 
 ### Changing the Color Theme
 
+The application uses a three-layer theme system:
+
+1. **Base Colors** - Raw RGB values defined in `frontend/theme.toml`
+2. **Semantic Colors** - Meaningful mappings (ACCENT, SUCCESS, ERROR, etc.)
+3. **Component Themes** - UI-specific style builders that follow standardized patterns
+
+#### Modifying Base Colors
+
 Edit `frontend/theme.toml`:
 
 ```toml
 [colors]
-my_color = [255, 128, 0]  # RGB values
+# Base colors (RGB values)
+lavender = [183, 189, 248]
+green = [166, 218, 149]
+red = [237, 135, 150]
+# ... add more colors
 
 [semantic]
-accent = "my_color"  # Use custom color
+# Semantic mappings
+accent = "lavender"
+success = "green"
+error = "red"
 ```
 
-Theme is injected at build time via `frontend/build.rs`.
+Theme colors are injected at compile time via `frontend/build.rs`.
+
+#### Theme Design Pattern
+
+All component themes follow a standardized pattern defined in `frontend/src/theme/mod.rs`:
+
+**Standard Methods** (every focusable widget should implement):
+- `border_focused()` - Border style when focused
+- `border_unfocused()` - Border style when not focused
+
+**Standard Methods** (every list-like widget should implement):
+- `normal_item_style()` - Style for regular items
+- `selected_item_style()` - Style for selected items
+- `selected_prefix()` - Text prefix for selected items (e.g., "> ")
+
+**Common Helpers** (provided by `Theme`):
+- `Theme::standard_border_focused()` - Uses ACCENT color
+- `Theme::standard_border_unfocused()` - Uses OVERLAY1 color
+- `Theme::standard_selected_item()` - Uses SELECTED color + BOLD
+- `Theme::standard_normal_item()` - Uses TEXT color
+- `Theme::standard_title()` - Uses ACCENT color + BOLD
+- `Theme::standard_label()` - Uses DIM color
+- `Theme::standard_value()` - Uses YELLOW color
+- `Theme::standard_background()` - Uses MANTLE background
+- `Theme::standard_highlight_bg()` - Uses SURFACE1 background
+
+#### Per-File Theme Support
+
+Configuration files can specify custom theme variants in `config-manager.toml`:
+
+```toml
+[[files]]
+path = "/etc/nginx/nginx.conf"
+name = "nginx.conf"
+description = "Nginx main configuration"
+theme = "mocha"  # Optional: Custom theme variant
+```
+
+The `theme` field is passed from backend to frontend via the API and can be used to switch color schemes when editing specific files.
+
+#### Example: Creating a New Component Theme
+
+```rust
+use super::{Theme, SELECTED_PREFIX};
+use ratzilla::ratatui::style::Style;
+
+pub struct MyWidgetTheme;
+
+impl MyWidgetTheme {
+    pub fn border_focused() -> Style {
+        Theme::standard_border_focused()
+    }
+
+    pub fn border_unfocused() -> Style {
+        Theme::standard_border_unfocused()
+    }
+
+    pub fn selected_item_style() -> Style {
+        Theme::standard_selected_item()
+    }
+
+    pub fn normal_item_style() -> Style {
+        Theme::standard_normal_item()
+    }
+
+    pub fn selected_prefix() -> &'static str {
+        SELECTED_PREFIX  // Common "  " constant
+    }
+}
+```
+
+After modifying themes, rebuild the frontend:
+```bash
+just build-frontend
+# or
+./rebuild.sh --frontend-only
+```
 
 ---
 

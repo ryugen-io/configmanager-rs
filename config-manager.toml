@@ -11,11 +11,13 @@ allowed_extensions = ["conf", "toml", "txt", "sh", "fish", "rs", "json", "yaml",
 # - name: Display name in the UI
 # - description: Optional description
 # - readonly: Optional, if true the file cannot be edited
+# - theme: Optional, specify a custom theme variant for this file (e.g., "mocha", "latte")
 
 [[files]]
 path = "/etc/nginx/nginx.conf"
 name = "nginx.conf"
 description = "Nginx main configuration"
+# theme = "mocha"  # Optional: Uncomment to use a custom theme for this file
 
 [[files]]
 path = "/etc/docker/daemon.json"

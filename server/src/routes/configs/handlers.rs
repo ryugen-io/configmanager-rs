@@ -21,6 +21,7 @@ pub async fn list_configs(
                 name: file_cfg.name.clone(),
                 description: file_cfg.description.clone(),
                 readonly: file_cfg.readonly,
+                theme: file_cfg.theme.clone(),
             });
         }
     }

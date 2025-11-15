@@ -22,6 +22,10 @@ pub struct ConfigFile {
     pub description: String,
     #[serde(default)]
     pub readonly: bool,
+    /// Optional theme variant name for this file (e.g., "mocha", "latte", "frappe")
+    /// If not specified, the default theme is used
+    #[serde(default)]
+    pub theme: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

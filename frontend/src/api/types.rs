@@ -5,6 +5,9 @@ pub struct FileInfo {
     pub name: String,
     pub description: String,
     pub readonly: bool,
+    /// Optional theme variant for this file
+    #[serde(default)]
+    pub theme: Option<String>,
 }
 
 #[derive(Deserialize)]

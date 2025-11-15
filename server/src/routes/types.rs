@@ -5,6 +5,9 @@ pub struct FileInfo {
     pub name: String,
     pub description: String,
     pub readonly: bool,
+    /// Optional theme variant for this file
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub theme: Option<String>,
 }
 
 #[derive(Serialize)]
