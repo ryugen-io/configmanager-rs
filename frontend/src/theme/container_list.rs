@@ -1,40 +1,52 @@
 use super::Theme;
-use ratzilla::ratatui::style::{Modifier, Style};
+use ratzilla::ratatui::style::{Color, Modifier, Style};
 
+/// Theme styles for the container list widget
+///
+/// This component follows the standard theme pattern with some custom additions:
+/// - Uses standard border styles for focus states
+/// - Uses standard highlight for selected items
+/// - Adds semantic colors for container states
 pub struct ContainerListTheme;
 
 impl ContainerListTheme {
+    /// Style for container IDs
     pub fn id_style() -> Style {
-        Style::default().fg(Theme::YELLOW)
+        Theme::standard_value()
     }
 
+    /// Style for container names
     pub fn name_style() -> Style {
-        Style::default().fg(Theme::TEXT)
+        Theme::standard_normal_item()
     }
 
+    /// Style for status information text
     pub fn status_info_style() -> Style {
-        Style::default().fg(Theme::SUBTEXT0)
+        Theme::standard_label()
     }
 
-    pub fn status_color(state: &str) -> ratzilla::ratatui::style::Color {
+    /// Color for container state badge (semantic)
+    pub fn status_color(state: &str) -> Color {
         match state {
-            "running" => Theme::GREEN,
+            "running" => Theme::SUCCESS,
             "exited" => Theme::OVERLAY1,
             _ => Theme::YELLOW,
         }
     }
 
+    /// Border style when container list is focused
     pub fn border_focused() -> Style {
-        Style::default().fg(Theme::ACCENT)
+        Theme::standard_border_focused()
     }
 
+    /// Border style when container list is not focused
     pub fn border_unfocused() -> Style {
-        Style::default().fg(Theme::OVERLAY1)
+        Theme::standard_border_unfocused()
     }
 
+    /// Style for selected/highlighted container
     pub fn highlight_style() -> Style {
-        Style::default()
-            .bg(Theme::SURFACE1)
+        Theme::standard_highlight_bg()
             .fg(Theme::TEXT)
             .add_modifier(Modifier::BOLD)
     }
