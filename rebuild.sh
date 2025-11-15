@@ -203,7 +203,7 @@ check_config() {
 
 # Build backend
 build_backend() {
-    log_info "Building backend..."
+    echo -e "${BLUE}[rebuild]${NC} Building backend..."
 
     if [ "$SKIP_FORMAT" = false ]; then
         log_info "Formatting backend code..."
@@ -225,12 +225,12 @@ build_backend() {
         exit 1
     }
 
-    log_info "Backend build successful"
+    echo -e "${GREEN}[rebuild]${NC} Backend build successful"
 }
 
 # Build frontend
 build_frontend() {
-    log_info "Building frontend..."
+    echo -e "${BLUE}[rebuild]${NC} Building frontend..."
 
     cd "$SCRIPT_DIR/frontend" || {
         log_error "Frontend directory not found"
@@ -258,12 +258,12 @@ build_frontend() {
     }
 
     cd "$SCRIPT_DIR"
-    log_info "Frontend build successful"
+    echo -e "${GREEN}[rebuild]${NC} Frontend build successful"
 }
 
 # Start server
 start_server() {
-    log_info "Starting server..."
+    echo -e "${MAUVE}[rebuild]${NC} Starting server..."
 
     # Remove old log file
     rm -f "$LOG_FILE"
@@ -292,11 +292,11 @@ start_server() {
     local attempt=0
     while [ $attempt -lt $max_attempts ]; do
         if check_port; then
-            log_info "Server started successfully (PID: $server_pid)"
-            log_info "Access at http://${SERVER_HOST}:${SERVER_PORT}"
-            log_info "Server logs: tail -f $LOG_FILE"
-            log_info "Stop server: kill $server_pid"
-            log_info "Refresh your browser to see changes"
+            echo ""
+            echo -e "${GREEN}[rebuild]${NC} Server running (PID: $server_pid)"
+            log_info "URL: http://${SERVER_HOST}:${SERVER_PORT}"
+            log_info "Logs: tail -f $LOG_FILE"
+            log_info "Stop: ./stop.sh"
             return 0
         fi
         attempt=$((attempt + 1))
@@ -336,7 +336,7 @@ main() {
     if [ "$START_SERVER" = true ]; then
         start_server
     else
-        log_info "Skipping server start (--no-server flag)"
+        echo -e "${BLUE}[rebuild]${NC} Skipping server start (--no-server flag)"
     fi
 }
 

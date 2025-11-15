@@ -57,7 +57,7 @@ stop_by_pid() {
         return 1
     fi
 
-    log_info "Stopping server with PID $pid..."
+    echo -e "${BLUE}[stop]${NC} Stopping server (PID: $pid)..."
     kill "$pid" 2>/dev/null || true
 
     # Wait up to 5 seconds for graceful shutdown
