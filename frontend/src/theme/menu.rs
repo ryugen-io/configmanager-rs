@@ -1,4 +1,4 @@
-use super::{Theme, NORMAL_PREFIX, SELECTED_PREFIX};
+use super::{NORMAL_PREFIX, SELECTED_PREFIX, Theme};
 use ratzilla::ratatui::style::Style;
 
 /// Theme styles for the main menu widget

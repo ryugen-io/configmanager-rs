@@ -1,4 +1,4 @@
-use super::{Theme, SELECTED_PREFIX};
+use super::{SELECTED_PREFIX, Theme};
 use ratzilla::ratatui::style::Style;
 
 /// Theme styles for the file list widget
