@@ -72,6 +72,7 @@ pub fn scan_directory(dir_config: &ConfigDirectory) -> Result<Vec<ConfigFile>, S
             name: display_name,
             description: format!("From directory: {}", dir_config.description),
             readonly: dir_config.readonly,
+            theme: None,
         });
     }
 
