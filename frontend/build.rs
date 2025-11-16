@@ -16,4 +16,6 @@ fn main() {
     // Rerun if files change
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=theme.toml");
+    println!("cargo:rerun-if-changed=../.git/HEAD");
+    println!("cargo:rerun-if-changed=../.git/refs/heads");
 }
