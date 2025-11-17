@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent
+REPO_ROOT = SCRIPT_DIR.parent.parent
 sys.path.insert(0, str(REPO_ROOT / '.sys' / 'theme'))
 
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info

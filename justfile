@@ -2,38 +2,59 @@
 
 # Rebuild project (format, build backend with auditable, build frontend with trunk)
 rebuild:
-    ./rebuild.sh
+    ./rebuild.py
+
+# Rebuild backend only
+rebuild-backend:
+    ./rebuild.py --backend-only
+
+# Rebuild frontend only
+rebuild-frontend:
+    ./rebuild.py --frontend-only
+
+# Rebuild without starting server
+rebuild-no-server:
+    ./rebuild.py --no-server
 
 # Format all code
 fmt:
-    cargo fmt --all
-    cd frontend && cargo fmt
+    ./.sys/rust/rustfmt.py
 
 # Run clippy on all targets
 clippy:
-    cargo clippy --all-targets -- -D warnings
-    cd frontend && cargo clippy --all-targets -- -D warnings
+    ./.sys/rust/clippy.py
 
-# Build backend only
-build-backend:
-    cargo build --release
+# Run cargo check
+check:
+    ./.sys/rust/check.py
 
-# Build backend with auditable
-build-backend-auditable:
-    cargo auditable build --release
+# Run tests
+test:
+    ./.sys/rust/test_rust.py
 
-# Build frontend only
-build-frontend:
-    cd frontend && trunk build --release
-
-# Run backend server
-run:
-    cargo run --bin config-manager-server
+# Run security audit
+audit:
+    ./.sys/rust/audit.py
 
 # Clean build artifacts
 clean:
-    cargo clean
-    cd frontend && cargo clean
+    ./.sys/rust/clean.py
+
+# Start server (background process)
+start:
+    ./start.py
+
+# Stop server
+stop:
+    ./stop.py
+
+# Check server status
+status:
+    ./status.py
+
+# View server logs
+logs:
+    tail -f server.log
 
 # Count lines of code
 loc:

@@ -2,8 +2,8 @@
 
 This document provides comprehensive guidance for AI assistants working on the Config Manager codebase. It covers architecture, development workflows, conventions, and best practices.
 
-**Last Updated:** 2025-11-15
-**Version:** 0.1.0
+**Last Updated:** 2025-11-17
+**Version:** 0.1.1
 
 ---
 
@@ -103,11 +103,23 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 ├── Cargo.toml                  # Workspace root
 ├── Cargo.lock                  # Locked dependency versions
 ├── config-manager.toml         # Application configuration
-├── .env.example                # Environment variable template
 ├── deny.toml                   # Security audit config
 ├── justfile                    # Task automation
-├── rebuild.sh                  # Full build script
-├── start.sh & stop.sh          # Server lifecycle scripts
+├── rebuild.py                  # Full build script
+├── start.py & stop.py          # Server lifecycle scripts
+├── status.py                   # Server status checker
+├── .sys/                       # System utilities
+│   ├── env/                    # Environment configuration
+│   │   ├── .env                # Build script configuration
+│   │   └── .env.example        # Environment template
+│   ├── rust/                   # Rust development scripts
+│   │   ├── audit.py            # Security audit
+│   │   ├── check.py            # Cargo check
+│   │   ├── clean.py            # Clean artifacts
+│   │   ├── clippy.py           # Linting
+│   │   ├── rustfmt.py          # Code formatting
+│   │   └── test_rust.py        # Run tests
+│   └── theme/                  # Theme system (Catppuccin Mocha)
 │
 ├── server/                     # Backend API server
 │   ├── Cargo.toml             # Server dependencies
@@ -194,7 +206,8 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 | **Backend** | `server/src/main.rs:1` | Axum server setup, listens on `0.0.0.0:3000` |
 | **Frontend** | `frontend/src/lib.rs:1` | WASM entry point, initializes Ratzilla terminal |
 | **Config** | `config-manager.toml:1` | Application configuration (files, extensions) |
-| **Build** | `rebuild.sh:1` | Full build orchestration script |
+| **Build** | `rebuild.py:1` | Full build orchestration script (Python) |
+| **Env Config** | `.sys/env/.env:1` | Build script environment configuration |
 
 ---
 
@@ -222,7 +235,9 @@ cargo install just
 
 ```bash
 # Full rebuild and start server
-./rebuild.sh
+python rebuild.py
+# or
+./rebuild.py
 
 # Or using Just
 just rebuild
@@ -234,26 +249,26 @@ Access the application at: `http://localhost:3000`
 
 ```bash
 # Build backend only
-./rebuild.sh --backend-only
+./rebuild.py --backend-only
 just build-backend
 
 # Build frontend only
-./rebuild.sh --frontend-only
+./rebuild.py --frontend-only
 just build-frontend
 
 # Build without starting server
-./rebuild.sh --no-server
+./rebuild.py --no-server
 
 # Skip code formatting
-./rebuild.sh --skip-format
+./rebuild.py --skip-format
 ```
 
 ### Development Cycle
 
 1. **Make changes** to source code
-2. **Format code**: `just fmt` (or auto-format in `rebuild.sh`)
+2. **Format code**: `just fmt` (or auto-format in `rebuild.py`)
 3. **Lint**: `just clippy` (check for warnings)
-4. **Build**: `just rebuild` or `./rebuild.sh`
+4. **Build**: `just rebuild` or `./rebuild.py`
 5. **Test manually** via the web interface
 6. **Commit** with descriptive messages
 
@@ -261,12 +276,15 @@ just build-frontend
 
 ```bash
 # Start server (background process)
-./start.sh
+./start.py
 # PID saved to .server.pid
 # Logs to server.log
 
 # Stop server
-./stop.sh
+./stop.py
+
+# Check server status
+./status.py
 
 # View logs
 tail -f server.log
@@ -404,140 +422,60 @@ pub async fn fetch_file_list() -> Result<Vec<FileInfo>, String> {
 - ID-based paths: `/api/containers/:id/details`
 - Action verbs as path segments: `/api/containers/:id/start`
 
-### Shell Script Conventions
+### Python Script Conventions
 
-**IMPORTANT**: All shell scripts in this project follow a strict design pattern for consistency and visual appeal.
+**IMPORTANT**: All build and utility scripts are written in Python and follow a strict design pattern.
 
-#### Visual Indicators
+#### Theme System
 
-- ✅ **Use Nerd Font Icons**: All scripts use Nerd Font icons for visual indicators
-- ❌ **NO Emojis**: Never use emojis in shell scripts
+All scripts use the **Catppuccin Mocha** theme loaded from `.sys/theme/theme.py`:
 
-**Standard Icons**:
-```bash
-readonly CHECK=""   # Success indicator
-readonly CROSS=""   # Error indicator
-readonly WARN=""    # Warning indicator
-readonly INFO=""    # Info indicator
-readonly CHART="󰈙"  # Chart/metrics indicator
-readonly FILE=""    # File indicator
+- **Color Palette**: 24-bit true color (RED, GREEN, YELLOW, BLUE, MAUVE, etc.)
+- **Nerd Font Icons**: CHECK (✓), CROSS (✗), WARN (⚠), INFO (ℹ), etc.
+- **Consistent Logging**: Success, error, warning, and info messages
+
+#### Script Structure
+
+```python
+#!/usr/bin/env python3
+"""Brief description of what the script does"""
+
+import sys
+from pathlib import Path
+
+# Load theme from .sys/theme/theme.py
+sys.path.insert(0, str(Path(__file__).resolve().parent / '.sys' / 'theme'))
+from theme import Theme, Icons
+
+def load_env_config(repo_root: Path) -> dict:
+    """Load configuration from .sys/env/.env"""
+    # ... load config from .sys/env/.env
+
+def main():
+    theme = Theme()
+    print(f"{theme.MAUVE}[script-name]{theme.NC} Starting...")
+    # ... script logic
+    print(f"{theme.GREEN}{Icons.CHECK}  {theme.NC}Operation completed")
+
+if __name__ == '__main__':
+    main()
 ```
 
-#### Color Scheme
+#### Environment Configuration
 
-All scripts use the **Catppuccin Mocha** 24-bit true color palette:
-
-```bash
-# Catppuccin Mocha color palette (24-bit true color)
-readonly RED='\\033[38;2;243;139;168m'        # #f38ba8 - Errors
-readonly GREEN='\\033[38;2;166;227;161m'      # #a6e3a1 - Success/Info
-readonly YELLOW='\\033[38;2;249;226;175m'     # #f9e2af - Warnings
-readonly BLUE='\\033[38;2;137;180;250m'       # #89b4fa - Info highlights
-readonly MAUVE='\\033[38;2;203;166;247m'      # #cba6f7 - Headers
-readonly SAPPHIRE='\\033[38;2;116;199;236m'   # #74c7ec - Success highlights
-readonly TEXT='\\033[38;2;205;214;244m'       # #cdd6f4 - Normal text
-readonly SUBTEXT='\\033[38;2;186;194;222m'    # #bac2de - Subtext
-readonly NC='\\033[0m'                         # No Color
-```
-
-#### Standard Logging Functions
-
-Every script should implement these logging functions:
-
-```bash
-log_success() {
-    echo -e "${GREEN}${CHECK}  ${NC}$1"
-}
-
-log_error() {
-    echo -e "${RED}${CROSS}  ${NC}$1" >&2
-}
-
-log_warn() {
-    echo -e "${YELLOW}${WARN}  ${NC}$1"
-}
-
-log_info() {
-    echo -e "${BLUE}${INFO}  ${NC}$1"
-}
-```
-
-#### Tag Formatting
-
-Use consistent tag formatting for script identification:
-
-```bash
-echo -e "${MAUVE}[script-name]${NC} Doing something..."
-echo -e "${GREEN}[script-name]${NC} Success message"
-```
-
-Examples from existing scripts:
-- `[rebuild]` - rebuild.sh
-- `[start]` - start.sh
-- `[stop]` - stop.sh
-- `[lint]` - lint.sh
-- `[lines]` - lines.sh
-
-#### Error Handling
-
-All scripts must include proper error handling:
-
-```bash
-#!/bin/bash
-set -e           # Exit on error
-set -o pipefail  # Fail on pipe errors
-```
-
-#### Script Structure Template
-
-```bash
-#!/bin/bash
-# Brief description of what the script does
-
-set -e
-set -o pipefail
-
-# Catppuccin Mocha color palette
-readonly RED='\\033[38;2;243;139;168m'
-readonly GREEN='\\033[38;2;166;227;161m'
-readonly YELLOW='\\033[38;2;249;226;175m'
-readonly BLUE='\\033[38;2;137;180;250m'
-readonly MAUVE='\\033[38;2;203;166;247m'
-readonly NC='\\033[0m'
-
-# Nerd Font Icons
-readonly CHECK=""
-readonly CROSS=""
-readonly WARN=""
-
-log_success() {
-    echo -e "${GREEN}${CHECK}  ${NC}$1"
-}
-
-log_error() {
-    echo -e "${RED}${CROSS}  ${NC}$1" >&2
-}
-
-log_warn() {
-    echo -e "${YELLOW}${WARN}  ${NC}$1"
-}
-
-# Main script logic
-echo -e "${MAUVE}[script-name]${NC} Starting..."
-
-# ... your code here ...
-
-log_success "Operation completed"
-```
+- **Config File**: `.sys/env/.env` (loaded by all Python scripts)
+- **Template**: `.sys/env/.env.example` (for reference)
+- **Variables**: SERVER_HOST, SERVER_PORT, RUST_TOOLCHAIN, etc.
 
 #### Reference Scripts
 
 Follow the patterns established in:
-- `rebuild.sh:1` - Main build script (comprehensive example)
-- `start.sh:1` - Server startup
-- `stop.sh:1` - Server shutdown
-- `lines.sh:1` - Code metrics
-- `lint.sh:1` - Shell script linting
+- `rebuild.py:1` - Main build script (comprehensive example)
+- `start.py:1` - Server startup
+- `stop.py:1` - Server shutdown
+- `status.py:1` - Server status checker
+- `.sys/rust/clippy.py:1` - Linting
+- `.sys/rust/clean.py:1` - Cleanup utilities
 
 ---
 
@@ -621,7 +559,7 @@ cargo clippy --all-targets -- -D warnings
 ### Credential Handling
 
 **Never commit**:
-- `.env` files (use `.env.example` instead)
+- `.sys/env/.env` file (use `.sys/env/.env.example` template instead)
 - Certificates (`.pem`, `.key`, `.crt`)
 - SSH keys
 - Cloud credentials
@@ -650,13 +588,30 @@ cargo deny check
 
 ### Environment Variables
 
+Build scripts load configuration from `.sys/env/.env`:
+
 ```bash
-# .env (create from .env.example)
-SERVER_HOST=localhost  # For display URLs only
-# SERVER_PORT=3000     # Optional, defaults to 3000
+# .sys/env/.env (create from .sys/env/.env.example)
+# Server Configuration
+SERVER_HOST=10.1.1.30     # Display host in status messages
+SERVER_PORT=3000          # Server port
+SERVER_BINARY=config-manager-server
+DISPLAY_NAME=Config Manager
+
+# Build Configuration
+RUST_TOOLCHAIN=stable
+CARGO_AUDITABLE=true
+TRUNK_ENABLED=true
+
+# Paths
+SERVER_DIR=server
+FRONTEND_DIR=frontend
+CONFIG_FILE=config-manager.toml
+
+# See .sys/env/.env.example for full list
 ```
 
-**Security Note**: `SERVER_HOST` affects UI display only, not actual binding (always `0.0.0.0:3000`).
+**Note**: The Rust server does not use dotenv. Configuration is passed via command-line arguments or environment variables at runtime.
 
 ---
 
@@ -681,7 +636,7 @@ SERVER_HOST=localhost  # For display URLs only
 
 3. Restart server:
    ```bash
-   ./stop.sh && ./start.sh
+   ./stop.py && ./start.py
    ```
 
 4. Refresh browser to see new file in list
@@ -889,7 +844,7 @@ After modifying themes, rebuild the frontend:
 ```bash
 just build-frontend
 # or
-./rebuild.sh --frontend-only
+./rebuild.py --frontend-only
 ```
 
 ---
@@ -1077,7 +1032,7 @@ rustup target add wasm32-unknown-unknown
 
 ```bash
 # Solution:
-./stop.sh  # Stop existing server
+./stop.py  # Stop existing server
 # Or find and kill the process:
 lsof -i :3000
 kill <PID>
@@ -1116,7 +1071,7 @@ ls -la config-manager.toml
    allowed_extensions = ["conf", ...]
    ```
 
-3. Restart server: `./stop.sh && ./start.sh`
+3. Restart server: `./stop.py && ./start.py`
 
 **Problem**: "Readonly file" error when saving
 
@@ -1149,7 +1104,7 @@ docker info
 
 **Problem**: Changes not reflected in browser
 
-1. Rebuild: `./rebuild.sh`
+1. Rebuild: `./rebuild.py`
 2. Hard refresh browser: `Ctrl+Shift+R` (or `Cmd+Shift+R` on Mac)
 3. Clear browser cache
 4. Check `frontend/dist/` was updated
@@ -1188,7 +1143,7 @@ cargo clippy --fix --all-targets
 4. **Test after changes**:
    - Run `just clippy` to catch issues
    - Run `just fmt` to format code
-   - Rebuild and manually test: `./rebuild.sh`
+   - Rebuild and manually test: `./rebuild.py`
 
 5. **Document non-obvious logic**:
    - Add comments explaining "why", not just "what"

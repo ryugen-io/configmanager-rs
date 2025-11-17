@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rust test runner using cargo test
-Runs all tests in Rust projects
+Rust linter using cargo clippy
+Checks Rust code for common mistakes and improvements
 """
 
 import sys
@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parent
+REPO_ROOT = SCRIPT_DIR.parent.parent
 sys.path.insert(0, str(REPO_ROOT / '.sys' / 'theme'))
 
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info
@@ -55,10 +55,24 @@ def check_cargo() -> bool:
         return False
 
 
-def get_cargo_version() -> str:
-    """Get cargo version"""
+def check_clippy() -> bool:
+    """Check if clippy is installed"""
     try:
-        result = subprocess.run(['cargo', '--version'], capture_output=True, text=True, check=True)
+        subprocess.run(['cargo', 'clippy', '--version'], capture_output=True, check=True)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        log_error("clippy is not installed")
+        print()
+        print(f"{Colors.TEXT}Install clippy:{Colors.NC}")
+        print(f"{Colors.TEXT}  rustup component add clippy{Colors.NC}")
+        print()
+        return False
+
+
+def get_clippy_version() -> str:
+    """Get clippy version"""
+    try:
+        result = subprocess.run(['cargo', 'clippy', '--version'], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return "unknown"
@@ -80,19 +94,17 @@ def find_cargo_projects(base_path: Path, recursive: bool) -> List[Path]:
     return sorted(set(projects))
 
 
-def test_project(project_path: Path, verbose: bool = False, nocapture: bool = False) -> int:
+def lint_project(project_path: Path, deny_warnings: bool = False) -> int:
     """
-    Test a Rust project with cargo test
-    Returns: 0=passed, 1=failed, 2=error
+    Lint a Rust project with clippy
+    Returns: 0=no warnings, 1=warnings found, 2=failed
     """
     project_name = project_path.name
 
-    cmd = ['cargo', 'test']
-    if verbose:
-        cmd.append('--verbose')
-    if nocapture:
-        cmd.append('--')
-        cmd.append('--nocapture')
+    cmd = ['cargo', 'clippy', '--all-targets', '--all-features', '--']
+    if deny_warnings:
+        cmd.append('-D')
+        cmd.append('warnings')
 
     try:
         result = subprocess.run(
@@ -104,12 +116,10 @@ def test_project(project_path: Path, verbose: bool = False, nocapture: bool = Fa
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - All tests passed")
-            if verbose and result.stdout:
-                print(f"{Colors.TEXT}{result.stdout.strip()}{Colors.NC}")
+            log_success(f"  {project_name} - No issues found")
             return 0
         else:
-            log_error(f"  {project_name} - Tests failed")
+            log_warn(f"  {project_name} - Issues found")
             if result.stdout:
                 print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
             if result.stderr:
@@ -117,7 +127,7 @@ def test_project(project_path: Path, verbose: bool = False, nocapture: bool = Fa
             return 1
 
     except Exception as e:
-        log_error(f"  Error testing {project_name}: {e}")
+        log_error(f"  Error linting {project_name}: {e}")
         return 2
 
 
@@ -128,24 +138,21 @@ def main():
     config = load_env_config(REPO_ROOT)
 
     parser = argparse.ArgumentParser(
-        description='Rust test runner using cargo test',
+        description='Rust linter using cargo clippy',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Run tests in current Rust project
-  python3 test_rust.py
+  # Lint current Rust project
+  python3 clippy.py
 
-  # Run tests in all Rust projects
-  python3 test_rust.py --recursive
+  # Lint all Rust projects in directory
+  python3 clippy.py --recursive
 
-  # Run tests with verbose output
-  python3 test_rust.py --verbose
+  # Treat warnings as errors
+  python3 clippy.py --deny-warnings
 
-  # Run tests with output from test code
-  python3 test_rust.py --nocapture
-
-  # Test specific project
-  python3 test_rust.py --path /path/to/rust-project
+  # Lint specific project
+  python3 clippy.py --path /path/to/rust-project
         '''
     )
 
@@ -163,27 +170,24 @@ Examples:
     )
 
     parser.add_argument(
-        '-v', '--verbose',
+        '-d', '--deny-warnings',
         action='store_true',
-        help='Verbose test output'
-    )
-
-    parser.add_argument(
-        '-n', '--nocapture',
-        action='store_true',
-        help='Show output from test code (--nocapture)'
+        help='Treat warnings as errors'
     )
 
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[test]{Colors.NC} {Icons.ROCKET}  Rust Test Runner")
+    print(f"{Colors.MAUVE}[clippy]{Colors.NC} {Icons.WARN}  Rust Linter")
     print()
 
     if not check_cargo():
         return 1
 
-    version = get_cargo_version()
+    if not check_clippy():
+        return 1
+
+    version = get_clippy_version()
     log_info(f"Using {version}")
     print()
 
@@ -202,42 +206,45 @@ Examples:
     log_info(f"Found {len(projects)} Rust project(s)")
     print()
 
-    passed = 0
-    failed_tests = 0
-    failed_run = 0
+    clean = 0
+    warnings = 0
+    failed = 0
 
     for project_path in projects:
-        result = test_project(project_path, verbose=args.verbose, nocapture=args.nocapture)
+        result = lint_project(project_path, deny_warnings=args.deny_warnings)
         if result == 0:
-            passed += 1
+            clean += 1
         elif result == 1:
-            failed_tests += 1
+            warnings += 1
         elif result == 2:
-            failed_run += 1
+            failed += 1
 
     print()
     print(f"{Colors.MAUVE}Summary{Colors.NC}")
     print()
 
-    total = passed + failed_tests + failed_run
+    total = clean + warnings + failed
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
-    if passed > 0:
-        print(f"{Colors.GREEN}Passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
+    if clean > 0:
+        print(f"{Colors.GREEN}No issues:           {Colors.NC}{Colors.SAPPHIRE}{clean}{Colors.NC}")
 
-    if failed_tests > 0:
-        print(f"{Colors.YELLOW}Failed tests:        {Colors.NC}{Colors.SAPPHIRE}{failed_tests}{Colors.NC}")
+    if warnings > 0:
+        print(f"{Colors.YELLOW}Issues found:        {Colors.NC}{Colors.SAPPHIRE}{warnings}{Colors.NC}")
 
-    if failed_run > 0:
-        print(f"{Colors.RED}Failed to run:       {Colors.NC}{Colors.SAPPHIRE}{failed_run}{Colors.NC}")
+    if failed > 0:
+        print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
 
     print()
 
-    if failed_tests > 0 or failed_run > 0:
-        log_error("Some tests failed")
+    if failed > 0:
+        log_error("Some projects failed to lint")
+        return 1
+    elif warnings > 0:
+        log_warn("Some projects have linting issues")
         return 1
     else:
-        log_success("All tests passed!")
+        log_success("All projects passed linting!")
         return 0
 
 
