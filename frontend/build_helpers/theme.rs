@@ -1,7 +1,8 @@
 use std::fs;
 
 pub fn load_theme_config() {
-    let theme_content = fs::read_to_string("theme.toml").expect("Failed to read theme.toml");
+    let theme_content = fs::read_to_string("../sys/theme/theme.toml")
+        .expect("Failed to read ../sys/theme/theme.toml");
     let theme: toml::Value = toml::from_str(&theme_content).expect("Failed to parse theme.toml");
 
     let colors = theme

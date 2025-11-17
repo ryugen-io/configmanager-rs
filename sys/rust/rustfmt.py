@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rust test runner using cargo test
-Runs all tests in Rust projects
+Rust code formatter using cargo fmt
+Automatically formats all Rust code in the workspace
 """
 
 import sys
@@ -9,9 +9,10 @@ import subprocess
 from pathlib import Path
 from typing import List
 
+# Add sys/theme to path for central theming
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
-sys.path.insert(0, str(REPO_ROOT / '.sys' / 'theme'))
+sys.path.insert(0, str(REPO_ROOT / 'sys' / 'theme'))
 
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info
 
@@ -55,10 +56,24 @@ def check_cargo() -> bool:
         return False
 
 
-def get_cargo_version() -> str:
-    """Get cargo version"""
+def check_rustfmt() -> bool:
+    """Check if rustfmt is installed"""
     try:
-        result = subprocess.run(['cargo', '--version'], capture_output=True, text=True, check=True)
+        subprocess.run(['rustfmt', '--version'], capture_output=True, check=True)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        log_error("rustfmt is not installed")
+        print()
+        print(f"{Colors.TEXT}Install rustfmt:{Colors.NC}")
+        print(f"{Colors.TEXT}  rustup component add rustfmt{Colors.NC}")
+        print()
+        return False
+
+
+def get_rustfmt_version() -> str:
+    """Get rustfmt version"""
+    try:
+        result = subprocess.run(['rustfmt', '--version'], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return "unknown"
@@ -80,19 +95,16 @@ def find_cargo_projects(base_path: Path, recursive: bool) -> List[Path]:
     return sorted(set(projects))
 
 
-def test_project(project_path: Path, verbose: bool = False, nocapture: bool = False) -> int:
+def format_project(project_path: Path, check_mode: bool = False) -> int:
     """
-    Test a Rust project with cargo test
-    Returns: 0=passed, 1=failed, 2=error
+    Format a Rust project
+    Returns: 0=formatted, 1=unchanged, 2=failed
     """
     project_name = project_path.name
 
-    cmd = ['cargo', 'test']
-    if verbose:
-        cmd.append('--verbose')
-    if nocapture:
-        cmd.append('--')
-        cmd.append('--nocapture')
+    cmd = ['cargo', 'fmt']
+    if check_mode:
+        cmd.append('--check')
 
     try:
         result = subprocess.run(
@@ -104,20 +116,24 @@ def test_project(project_path: Path, verbose: bool = False, nocapture: bool = Fa
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - All tests passed")
-            if verbose and result.stdout:
-                print(f"{Colors.TEXT}{result.stdout.strip()}{Colors.NC}")
-            return 0
+            if check_mode:
+                print(f"  {Colors.TEXT}{project_name}{Colors.NC} {Colors.SAPPHIRE}(already formatted){Colors.NC}")
+                return 1
+            else:
+                log_success(f"  Formatted {project_name}")
+                return 0
         else:
-            log_error(f"  {project_name} - Tests failed")
-            if result.stdout:
-                print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
-            if result.stderr:
-                print(f"{Colors.RED}{result.stderr.strip()}{Colors.NC}")
-            return 1
+            if check_mode:
+                log_warn(f"  {project_name} needs formatting")
+                return 0
+            else:
+                log_error(f"  Failed to format {project_name}")
+                if result.stderr:
+                    print(f"{Colors.RED}{result.stderr.strip()}{Colors.NC}")
+                return 2
 
     except Exception as e:
-        log_error(f"  Error testing {project_name}: {e}")
+        log_error(f"  Error formatting {project_name}: {e}")
         return 2
 
 
@@ -128,24 +144,21 @@ def main():
     config = load_env_config(REPO_ROOT)
 
     parser = argparse.ArgumentParser(
-        description='Rust test runner using cargo test',
+        description='Rust code formatter using cargo fmt',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Run tests in current Rust project
-  python3 test_rust.py
+  # Format current Rust project
+  python3 rustfmt.py
 
-  # Run tests in all Rust projects
-  python3 test_rust.py --recursive
+  # Check formatting without modifying files
+  python3 rustfmt.py --check
 
-  # Run tests with verbose output
-  python3 test_rust.py --verbose
+  # Format all Rust projects in directory
+  python3 rustfmt.py --recursive
 
-  # Run tests with output from test code
-  python3 test_rust.py --nocapture
-
-  # Test specific project
-  python3 test_rust.py --path /path/to/rust-project
+  # Format specific project
+  python3 rustfmt.py --path /path/to/rust-project
         '''
     )
 
@@ -163,27 +176,28 @@ Examples:
     )
 
     parser.add_argument(
-        '-v', '--verbose',
+        '-c', '--check',
         action='store_true',
-        help='Verbose test output'
-    )
-
-    parser.add_argument(
-        '-n', '--nocapture',
-        action='store_true',
-        help='Show output from test code (--nocapture)'
+        help='Check mode - do not modify files, just report'
     )
 
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[test]{Colors.NC} {Icons.ROCKET}  Rust Test Runner")
+    print(f"{Colors.MAUVE}[rustfmt]{Colors.NC} {Icons.HAMMER}  Rust Code Formatter")
     print()
+
+    if args.check:
+        log_info("Running in check mode (no files will be modified)")
+        print()
 
     if not check_cargo():
         return 1
 
-    version = get_cargo_version()
+    if not check_rustfmt():
+        return 1
+
+    version = get_rustfmt_version()
     log_info(f"Using {version}")
     print()
 
@@ -202,42 +216,50 @@ Examples:
     log_info(f"Found {len(projects)} Rust project(s)")
     print()
 
-    passed = 0
-    failed_tests = 0
-    failed_run = 0
+    formatted = 0
+    unchanged = 0
+    failed = 0
 
     for project_path in projects:
-        result = test_project(project_path, verbose=args.verbose, nocapture=args.nocapture)
+        result = format_project(project_path, check_mode=args.check)
         if result == 0:
-            passed += 1
+            formatted += 1
         elif result == 1:
-            failed_tests += 1
+            unchanged += 1
         elif result == 2:
-            failed_run += 1
+            failed += 1
 
     print()
     print(f"{Colors.MAUVE}Summary{Colors.NC}")
     print()
 
-    total = passed + failed_tests + failed_run
+    total = formatted + unchanged + failed
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
-    if passed > 0:
-        print(f"{Colors.GREEN}Passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
+    if formatted > 0:
+        action = "Need formatting" if args.check else "Formatted"
+        print(f"{Colors.GREEN}{action}:         {Colors.NC}{Colors.SAPPHIRE}{formatted}{Colors.NC}")
 
-    if failed_tests > 0:
-        print(f"{Colors.YELLOW}Failed tests:        {Colors.NC}{Colors.SAPPHIRE}{failed_tests}{Colors.NC}")
+    if unchanged > 0:
+        print(f"{Colors.TEXT}Already formatted:   {Colors.NC}{Colors.SAPPHIRE}{unchanged}{Colors.NC}")
 
-    if failed_run > 0:
-        print(f"{Colors.RED}Failed to run:       {Colors.NC}{Colors.SAPPHIRE}{failed_run}{Colors.NC}")
+    if failed > 0:
+        print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
 
     print()
 
-    if failed_tests > 0 or failed_run > 0:
-        log_error("Some tests failed")
+    if failed > 0:
+        log_error("Some projects failed to format")
         return 1
+    elif formatted > 0:
+        if args.check:
+            log_warn("Some projects need formatting")
+            return 1
+        else:
+            log_success("All projects formatted successfully!")
+            return 0
     else:
-        log_success("All tests passed!")
+        log_success("All projects already formatted correctly!")
         return 0
 
 

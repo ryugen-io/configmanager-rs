@@ -72,9 +72,39 @@ impl AppConfig {
         &self.allowed_extensions
     }
 
-    /// Get the config file path
+    /// Get the config file path (XDG-compliant)
+    ///
+    /// Search order:
+    /// 1. CONFIG_MANAGER_CONFIG env var
+    /// 2. XDG_CONFIG_HOME/config-manager/config.toml
+    /// 3. ~/.config/config-manager/config.toml
+    /// 4. ./config-manager.toml (fallback)
     fn config_path() -> String {
-        std::env::var("CONFIG_MANAGER_CONFIG").unwrap_or_else(|_| "config-manager.toml".to_string())
+        use std::path::Path;
+
+        // 1. Explicit override via env var
+        if let Ok(path) = std::env::var("CONFIG_MANAGER_CONFIG") {
+            return path;
+        }
+
+        // 2. XDG_CONFIG_HOME (if set)
+        if let Ok(xdg_config) = std::env::var("XDG_CONFIG_HOME") {
+            let path = format!("{}/config-manager/config.toml", xdg_config);
+            if Path::new(&path).exists() {
+                return path;
+            }
+        }
+
+        // 3. ~/.config/ (XDG default)
+        if let Ok(home) = std::env::var("HOME") {
+            let path = format!("{}/.config/config-manager/config.toml", home);
+            if Path::new(&path).exists() {
+                return path;
+            }
+        }
+
+        // 4. Fallback: current directory
+        "config-manager.toml".to_string()
     }
 }
 

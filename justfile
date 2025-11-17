@@ -18,27 +18,27 @@ rebuild-no-server:
 
 # Format all code
 fmt:
-    ./.sys/rust/rustfmt.py
+    ./sys/rust/rustfmt.py
 
 # Run clippy on all targets
 clippy:
-    ./.sys/rust/clippy.py
+    ./sys/rust/clippy.py
 
 # Run cargo check
 check:
-    ./.sys/rust/check.py
+    ./sys/rust/check.py
 
 # Run tests
 test:
-    ./.sys/rust/test_rust.py
+    ./sys/rust/test_rust.py
 
 # Run security audit
 audit:
-    ./.sys/rust/audit.py
+    ./sys/rust/audit.py
 
 # Clean build artifacts
 clean:
-    ./.sys/rust/clean.py
+    ./sys/rust/clean.py
 
 # Start server (background process)
 start:

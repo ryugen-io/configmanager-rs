@@ -13,9 +13,11 @@ use tower_http::services::ServeDir;
 async fn main() {
     println!("{}", version::version_string());
 
-    // Load environment variables from .sys/env/.env if it exists
-    if let Err(e) = dotenvy::from_filename(".sys/env/.env") {
-        eprintln!("Warning: Could not load .sys/env/.env: {}", e);
+    // Load environment variables from sys/env/.env if it exists
+    let env_file =
+        std::env::var("CONFIG_MANAGER_ENV_FILE").unwrap_or_else(|_| "sys/env/.env".to_string());
+    if let Err(e) = dotenvy::from_filename(&env_file) {
+        eprintln!("Warning: Could not load {}: {}", env_file, e);
         eprintln!("Using default configuration values");
     }
 

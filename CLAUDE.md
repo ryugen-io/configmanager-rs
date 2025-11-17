@@ -108,7 +108,7 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 ├── rebuild.py                  # Full build script
 ├── start.py & stop.py          # Server lifecycle scripts
 ├── status.py                   # Server status checker
-├── .sys/                       # System utilities
+├── sys/                       # System utilities
 │   ├── env/                    # Environment configuration
 │   │   ├── .env                # Build script configuration
 │   │   └── .env.example        # Environment template
@@ -207,7 +207,7 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 | **Frontend** | `frontend/src/lib.rs:1` | WASM entry point, initializes Ratzilla terminal |
 | **Config** | `config-manager.toml:1` | Application configuration (files, extensions) |
 | **Build** | `rebuild.py:1` | Full build orchestration script (Python) |
-| **Env Config** | `.sys/env/.env:1` | Build script environment configuration |
+| **Env Config** | `sys/env/.env:1` | Build script environment configuration |
 
 ---
 
@@ -217,7 +217,7 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 
 **CRITICAL**: This project uses Python scripts for ALL build, formatting, linting, and server management tasks. These scripts provide:
 - Consistent theming (Catppuccin Mocha + Nerd Font icons)
-- Centralized configuration from `.sys/env/.env`
+- Centralized configuration from `sys/env/.env`
 - Better error handling and user feedback
 - Unified workflow across all operations
 
@@ -226,10 +226,10 @@ Both share the `Cargo.lock` file but have separate `Cargo.toml` manifests.
 | Task | Use This | NOT This |
 |------|----------|----------|
 | Build project | `./rebuild.py` or `just rebuild` | ❌ `cargo build`, `trunk build` |
-| Format code | `./.sys/rust/rustfmt.py` or `just fmt` | ❌ `cargo fmt` |
-| Run linter | `./.sys/rust/clippy.py` or `just clippy` | ❌ `cargo clippy` |
-| Run tests | `./.sys/rust/test_rust.py` or `just test` | ❌ `cargo test` |
-| Clean artifacts | `./.sys/rust/clean.py` or `just clean` | ❌ `cargo clean` |
+| Format code | `./sys/rust/rustfmt.py` or `just fmt` | ❌ `cargo fmt` |
+| Run linter | `./sys/rust/clippy.py` or `just clippy` | ❌ `cargo clippy` |
+| Run tests | `./sys/rust/test_rust.py` or `just test` | ❌ `cargo test` |
+| Clean artifacts | `./sys/rust/clean.py` or `just clean` | ❌ `cargo clean` |
 | Start server | `./start.py` or `just start` | ❌ `./target/release/config-manager-server` |
 | Stop server | `./stop.py` or `just stop` | ❌ `pkill config-manager-server` |
 
@@ -450,7 +450,7 @@ pub async fn fetch_file_list() -> Result<Vec<FileInfo>, String> {
 
 #### Theme System
 
-All scripts use the **Catppuccin Mocha** theme loaded from `.sys/theme/theme.py`:
+All scripts use the **Catppuccin Mocha** theme loaded from `sys/theme/theme.py`:
 
 - **Color Palette**: 24-bit true color (RED, GREEN, YELLOW, BLUE, MAUVE, etc.)
 - **Nerd Font Icons**: CHECK (✓), CROSS (✗), WARN (⚠), INFO (ℹ), etc.
@@ -465,13 +465,13 @@ All scripts use the **Catppuccin Mocha** theme loaded from `.sys/theme/theme.py`
 import sys
 from pathlib import Path
 
-# Load theme from .sys/theme/theme.py
+# Load theme from sys/theme/theme.py
 sys.path.insert(0, str(Path(__file__).resolve().parent / '.sys' / 'theme'))
 from theme import Theme, Icons
 
 def load_env_config(repo_root: Path) -> dict:
-    """Load configuration from .sys/env/.env"""
-    # ... load config from .sys/env/.env
+    """Load configuration from sys/env/.env"""
+    # ... load config from sys/env/.env
 
 def main():
     theme = Theme()
@@ -485,8 +485,8 @@ if __name__ == '__main__':
 
 #### Environment Configuration
 
-- **Config File**: `.sys/env/.env` (loaded by all Python scripts)
-- **Template**: `.sys/env/.env.example` (for reference)
+- **Config File**: `sys/env/.env` (loaded by all Python scripts)
+- **Template**: `sys/env/.env.example` (for reference)
 - **Variables**: SERVER_HOST, SERVER_PORT, RUST_TOOLCHAIN, etc.
 
 #### Reference Scripts
@@ -496,8 +496,8 @@ Follow the patterns established in:
 - `start.py:1` - Server startup
 - `stop.py:1` - Server shutdown
 - `status.py:1` - Server status checker
-- `.sys/rust/clippy.py:1` - Linting
-- `.sys/rust/clean.py:1` - Cleanup utilities
+- `sys/rust/clippy.py:1` - Linting
+- `sys/rust/clean.py:1` - Cleanup utilities
 
 ---
 
@@ -581,7 +581,7 @@ cargo clippy --all-targets -- -D warnings
 ### Credential Handling
 
 **Never commit**:
-- `.sys/env/.env` file (use `.sys/env/.env.example` template instead)
+- `sys/env/.env` file (use `sys/env/.env.example` template instead)
 - Certificates (`.pem`, `.key`, `.crt`)
 - SSH keys
 - Cloud credentials
@@ -610,10 +610,10 @@ cargo deny check
 
 ### Environment Variables
 
-Build scripts load configuration from `.sys/env/.env`:
+Build scripts load configuration from `sys/env/.env`:
 
 ```bash
-# .sys/env/.env (create from .sys/env/.env.example)
+# sys/env/.env (create from sys/env/.env.example)
 # Server Configuration
 SERVER_HOST=10.1.1.30     # Display host in status messages
 SERVER_PORT=3000          # Server port
@@ -630,7 +630,7 @@ SERVER_DIR=server
 FRONTEND_DIR=frontend
 CONFIG_FILE=config-manager.toml
 
-# See .sys/env/.env.example for full list
+# See sys/env/.env.example for full list
 ```
 
 **Note**: The Rust server does not use dotenv. Configuration is passed via command-line arguments or environment variables at runtime.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rust security audit using cargo auditable
-Builds binaries with embedded dependency info and checks for vulnerabilities
+Rust linter using cargo clippy
+Checks Rust code for common mistakes and improvements
 """
 
 import sys
@@ -11,7 +11,7 @@ from typing import List
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
-sys.path.insert(0, str(REPO_ROOT / '.sys' / 'theme'))
+sys.path.insert(0, str(REPO_ROOT / 'sys' / 'theme'))
 
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info
 
@@ -55,32 +55,24 @@ def check_cargo() -> bool:
         return False
 
 
-def check_auditable() -> bool:
-    """Check if cargo-auditable is installed"""
+def check_clippy() -> bool:
+    """Check if clippy is installed"""
     try:
-        subprocess.run(['cargo', 'auditable', '--version'], capture_output=True, check=True)
+        subprocess.run(['cargo', 'clippy', '--version'], capture_output=True, check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
-        log_error("cargo-auditable is not installed")
+        log_error("clippy is not installed")
         print()
-        print(f"{Colors.TEXT}Install cargo-auditable:{Colors.NC}")
-        print(f"{Colors.TEXT}  cargo install cargo-auditable{Colors.NC}")
-        print()
-        print(f"{Colors.BLUE}cargo-auditable embeds dependency info into Rust binaries{Colors.NC}")
-        print(f"{Colors.BLUE}for better supply chain security and auditing.{Colors.NC}")
+        print(f"{Colors.TEXT}Install clippy:{Colors.NC}")
+        print(f"{Colors.TEXT}  rustup component add clippy{Colors.NC}")
         print()
         return False
 
 
-def get_auditable_version() -> str:
-    """Get cargo-auditable version"""
+def get_clippy_version() -> str:
+    """Get clippy version"""
     try:
-        result = subprocess.run(
-            ['cargo', 'auditable', '--version'],
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        result = subprocess.run(['cargo', 'clippy', '--version'], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return "unknown"
@@ -102,20 +94,17 @@ def find_cargo_projects(base_path: Path, recursive: bool) -> List[Path]:
     return sorted(set(projects))
 
 
-def audit_project(project_path: Path, build_mode: str = 'check') -> int:
+def lint_project(project_path: Path, deny_warnings: bool = False) -> int:
     """
-    Audit a Rust project with cargo auditable
-    build_mode: 'check' or 'build' (build creates actual binaries)
-    Returns: 0=success, 1=warnings/issues, 2=failed
+    Lint a Rust project with clippy
+    Returns: 0=no warnings, 1=warnings found, 2=failed
     """
     project_name = project_path.name
 
-    if build_mode == 'build':
-        log_info(f"  Building {project_name} with embedded audit info...")
-        cmd = ['cargo', 'auditable', 'build', '--release']
-    else:
-        log_info(f"  Checking {project_name} dependencies...")
-        cmd = ['cargo', 'auditable', 'build', '--release']
+    cmd = ['cargo', 'clippy', '--all-targets', '--all-features', '--']
+    if deny_warnings:
+        cmd.append('-D')
+        cmd.append('warnings')
 
     try:
         result = subprocess.run(
@@ -127,14 +116,10 @@ def audit_project(project_path: Path, build_mode: str = 'check') -> int:
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - Audit complete, no issues")
-            if build_mode == 'build':
-                binary_path = project_path / 'target' / 'release'
-                if binary_path.exists():
-                    print(f"    {Colors.SAPPHIRE}Binary location: {binary_path}{Colors.NC}")
+            log_success(f"  {project_name} - No issues found")
             return 0
         else:
-            log_warn(f"  {project_name} - Build completed with warnings")
+            log_warn(f"  {project_name} - Issues found")
             if result.stdout:
                 print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
             if result.stderr:
@@ -142,7 +127,7 @@ def audit_project(project_path: Path, build_mode: str = 'check') -> int:
             return 1
 
     except Exception as e:
-        log_error(f"  Error auditing {project_name}: {e}")
+        log_error(f"  Error linting {project_name}: {e}")
         return 2
 
 
@@ -153,27 +138,21 @@ def main():
     config = load_env_config(REPO_ROOT)
 
     parser = argparse.ArgumentParser(
-        description='Rust security audit using cargo auditable',
+        description='Rust linter using cargo clippy',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Audit current Rust project (check mode)
-  python3 audit.py
+  # Lint current Rust project
+  python3 clippy.py
 
-  # Build binaries with embedded dependency info
-  python3 audit.py --build
+  # Lint all Rust projects in directory
+  python3 clippy.py --recursive
 
-  # Audit all Rust projects in directory
-  python3 audit.py --recursive
+  # Treat warnings as errors
+  python3 clippy.py --deny-warnings
 
-  # Audit specific project
-  python3 audit.py --path /path/to/rust-project
-
-About cargo-auditable:
-  cargo-auditable builds Rust binaries with embedded dependency
-  information, enabling better supply chain security auditing.
-  This is more comprehensive than cargo-audit as it embeds
-  the dependency tree directly into the binary.
+  # Lint specific project
+  python3 clippy.py --path /path/to/rust-project
         '''
     )
 
@@ -191,24 +170,24 @@ About cargo-auditable:
     )
 
     parser.add_argument(
-        '-b', '--build',
+        '-d', '--deny-warnings',
         action='store_true',
-        help='Build binaries (default: check only)'
+        help='Treat warnings as errors'
     )
 
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[audit]{Colors.NC} {Icons.INFO}  Rust Security Audit (cargo auditable)")
+    print(f"{Colors.MAUVE}[clippy]{Colors.NC} {Icons.WARN}  Rust Linter")
     print()
 
     if not check_cargo():
         return 1
 
-    if not check_auditable():
+    if not check_clippy():
         return 1
 
-    version = get_auditable_version()
+    version = get_clippy_version()
     log_info(f"Using {version}")
     print()
 
@@ -225,8 +204,6 @@ About cargo-auditable:
         return 1
 
     log_info(f"Found {len(projects)} Rust project(s)")
-    build_mode = 'build' if args.build else 'check'
-    log_info(f"Mode: {build_mode}")
     print()
 
     clean = 0
@@ -234,15 +211,15 @@ About cargo-auditable:
     failed = 0
 
     for project_path in projects:
-        result = audit_project(project_path, build_mode=build_mode)
+        result = lint_project(project_path, deny_warnings=args.deny_warnings)
         if result == 0:
             clean += 1
         elif result == 1:
             warnings += 1
         elif result == 2:
             failed += 1
-        print()
 
+    print()
     print(f"{Colors.MAUVE}Summary{Colors.NC}")
     print()
 
@@ -250,10 +227,10 @@ About cargo-auditable:
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
     if clean > 0:
-        print(f"{Colors.GREEN}Clean:               {Colors.NC}{Colors.SAPPHIRE}{clean}{Colors.NC}")
+        print(f"{Colors.GREEN}No issues:           {Colors.NC}{Colors.SAPPHIRE}{clean}{Colors.NC}")
 
     if warnings > 0:
-        print(f"{Colors.YELLOW}Warnings:            {Colors.NC}{Colors.SAPPHIRE}{warnings}{Colors.NC}")
+        print(f"{Colors.YELLOW}Issues found:        {Colors.NC}{Colors.SAPPHIRE}{warnings}{Colors.NC}")
 
     if failed > 0:
         print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
@@ -261,13 +238,13 @@ About cargo-auditable:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to audit")
+        log_error("Some projects failed to lint")
         return 1
     elif warnings > 0:
-        log_warn("Some projects have warnings")
-        return 0
+        log_warn("Some projects have linting issues")
+        return 1
     else:
-        log_success("All projects passed audit!")
+        log_success("All projects passed linting!")
         return 0
 
 

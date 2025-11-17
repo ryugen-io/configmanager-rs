@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rust code formatter using cargo fmt
-Automatically formats all Rust code in the workspace
+Rust security audit using cargo auditable
+Builds binaries with embedded dependency info and checks for vulnerabilities
 """
 
 import sys
@@ -9,10 +9,9 @@ import subprocess
 from pathlib import Path
 from typing import List
 
-# Add .sys/theme to path for central theming
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent.parent
-sys.path.insert(0, str(REPO_ROOT / '.sys' / 'theme'))
+sys.path.insert(0, str(REPO_ROOT / 'sys' / 'theme'))
 
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info
 
@@ -56,24 +55,32 @@ def check_cargo() -> bool:
         return False
 
 
-def check_rustfmt() -> bool:
-    """Check if rustfmt is installed"""
+def check_auditable() -> bool:
+    """Check if cargo-auditable is installed"""
     try:
-        subprocess.run(['rustfmt', '--version'], capture_output=True, check=True)
+        subprocess.run(['cargo', 'auditable', '--version'], capture_output=True, check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
-        log_error("rustfmt is not installed")
+        log_error("cargo-auditable is not installed")
         print()
-        print(f"{Colors.TEXT}Install rustfmt:{Colors.NC}")
-        print(f"{Colors.TEXT}  rustup component add rustfmt{Colors.NC}")
+        print(f"{Colors.TEXT}Install cargo-auditable:{Colors.NC}")
+        print(f"{Colors.TEXT}  cargo install cargo-auditable{Colors.NC}")
+        print()
+        print(f"{Colors.BLUE}cargo-auditable embeds dependency info into Rust binaries{Colors.NC}")
+        print(f"{Colors.BLUE}for better supply chain security and auditing.{Colors.NC}")
         print()
         return False
 
 
-def get_rustfmt_version() -> str:
-    """Get rustfmt version"""
+def get_auditable_version() -> str:
+    """Get cargo-auditable version"""
     try:
-        result = subprocess.run(['rustfmt', '--version'], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ['cargo', 'auditable', '--version'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return "unknown"
@@ -95,16 +102,20 @@ def find_cargo_projects(base_path: Path, recursive: bool) -> List[Path]:
     return sorted(set(projects))
 
 
-def format_project(project_path: Path, check_mode: bool = False) -> int:
+def audit_project(project_path: Path, build_mode: str = 'check') -> int:
     """
-    Format a Rust project
-    Returns: 0=formatted, 1=unchanged, 2=failed
+    Audit a Rust project with cargo auditable
+    build_mode: 'check' or 'build' (build creates actual binaries)
+    Returns: 0=success, 1=warnings/issues, 2=failed
     """
     project_name = project_path.name
 
-    cmd = ['cargo', 'fmt']
-    if check_mode:
-        cmd.append('--check')
+    if build_mode == 'build':
+        log_info(f"  Building {project_name} with embedded audit info...")
+        cmd = ['cargo', 'auditable', 'build', '--release']
+    else:
+        log_info(f"  Checking {project_name} dependencies...")
+        cmd = ['cargo', 'auditable', 'build', '--release']
 
     try:
         result = subprocess.run(
@@ -116,24 +127,22 @@ def format_project(project_path: Path, check_mode: bool = False) -> int:
         )
 
         if result.returncode == 0:
-            if check_mode:
-                print(f"  {Colors.TEXT}{project_name}{Colors.NC} {Colors.SAPPHIRE}(already formatted){Colors.NC}")
-                return 1
-            else:
-                log_success(f"  Formatted {project_name}")
-                return 0
+            log_success(f"  {project_name} - Audit complete, no issues")
+            if build_mode == 'build':
+                binary_path = project_path / 'target' / 'release'
+                if binary_path.exists():
+                    print(f"    {Colors.SAPPHIRE}Binary location: {binary_path}{Colors.NC}")
+            return 0
         else:
-            if check_mode:
-                log_warn(f"  {project_name} needs formatting")
-                return 0
-            else:
-                log_error(f"  Failed to format {project_name}")
-                if result.stderr:
-                    print(f"{Colors.RED}{result.stderr.strip()}{Colors.NC}")
-                return 2
+            log_warn(f"  {project_name} - Build completed with warnings")
+            if result.stdout:
+                print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
+            if result.stderr:
+                print(f"{Colors.RED}{result.stderr.strip()}{Colors.NC}")
+            return 1
 
     except Exception as e:
-        log_error(f"  Error formatting {project_name}: {e}")
+        log_error(f"  Error auditing {project_name}: {e}")
         return 2
 
 
@@ -144,21 +153,27 @@ def main():
     config = load_env_config(REPO_ROOT)
 
     parser = argparse.ArgumentParser(
-        description='Rust code formatter using cargo fmt',
+        description='Rust security audit using cargo auditable',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Format current Rust project
-  python3 rustfmt.py
+  # Audit current Rust project (check mode)
+  python3 audit.py
 
-  # Check formatting without modifying files
-  python3 rustfmt.py --check
+  # Build binaries with embedded dependency info
+  python3 audit.py --build
 
-  # Format all Rust projects in directory
-  python3 rustfmt.py --recursive
+  # Audit all Rust projects in directory
+  python3 audit.py --recursive
 
-  # Format specific project
-  python3 rustfmt.py --path /path/to/rust-project
+  # Audit specific project
+  python3 audit.py --path /path/to/rust-project
+
+About cargo-auditable:
+  cargo-auditable builds Rust binaries with embedded dependency
+  information, enabling better supply chain security auditing.
+  This is more comprehensive than cargo-audit as it embeds
+  the dependency tree directly into the binary.
         '''
     )
 
@@ -176,28 +191,24 @@ Examples:
     )
 
     parser.add_argument(
-        '-c', '--check',
+        '-b', '--build',
         action='store_true',
-        help='Check mode - do not modify files, just report'
+        help='Build binaries (default: check only)'
     )
 
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[rustfmt]{Colors.NC} {Icons.HAMMER}  Rust Code Formatter")
+    print(f"{Colors.MAUVE}[audit]{Colors.NC} {Icons.INFO}  Rust Security Audit (cargo auditable)")
     print()
-
-    if args.check:
-        log_info("Running in check mode (no files will be modified)")
-        print()
 
     if not check_cargo():
         return 1
 
-    if not check_rustfmt():
+    if not check_auditable():
         return 1
 
-    version = get_rustfmt_version()
+    version = get_auditable_version()
     log_info(f"Using {version}")
     print()
 
@@ -214,34 +225,35 @@ Examples:
         return 1
 
     log_info(f"Found {len(projects)} Rust project(s)")
+    build_mode = 'build' if args.build else 'check'
+    log_info(f"Mode: {build_mode}")
     print()
 
-    formatted = 0
-    unchanged = 0
+    clean = 0
+    warnings = 0
     failed = 0
 
     for project_path in projects:
-        result = format_project(project_path, check_mode=args.check)
+        result = audit_project(project_path, build_mode=build_mode)
         if result == 0:
-            formatted += 1
+            clean += 1
         elif result == 1:
-            unchanged += 1
+            warnings += 1
         elif result == 2:
             failed += 1
+        print()
 
-    print()
     print(f"{Colors.MAUVE}Summary{Colors.NC}")
     print()
 
-    total = formatted + unchanged + failed
+    total = clean + warnings + failed
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
-    if formatted > 0:
-        action = "Need formatting" if args.check else "Formatted"
-        print(f"{Colors.GREEN}{action}:         {Colors.NC}{Colors.SAPPHIRE}{formatted}{Colors.NC}")
+    if clean > 0:
+        print(f"{Colors.GREEN}Clean:               {Colors.NC}{Colors.SAPPHIRE}{clean}{Colors.NC}")
 
-    if unchanged > 0:
-        print(f"{Colors.TEXT}Already formatted:   {Colors.NC}{Colors.SAPPHIRE}{unchanged}{Colors.NC}")
+    if warnings > 0:
+        print(f"{Colors.YELLOW}Warnings:            {Colors.NC}{Colors.SAPPHIRE}{warnings}{Colors.NC}")
 
     if failed > 0:
         print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
@@ -249,17 +261,13 @@ Examples:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to format")
+        log_error("Some projects failed to audit")
         return 1
-    elif formatted > 0:
-        if args.check:
-            log_warn("Some projects need formatting")
-            return 1
-        else:
-            log_success("All projects formatted successfully!")
-            return 0
+    elif warnings > 0:
+        log_warn("Some projects have warnings")
+        return 0
     else:
-        log_success("All projects already formatted correctly!")
+        log_success("All projects passed audit!")
         return 0
 
 
