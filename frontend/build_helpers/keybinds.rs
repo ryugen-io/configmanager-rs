@@ -10,6 +10,12 @@ use std::path::PathBuf;
 /// embedding into the WASM binary. Path must be relative to
 /// frontend/src/keybinds/mod.rs (where include_str! is called).
 pub fn load_keybinds_config() {
+    const BLUE: &str = "\x1b[38;2;137;180;250m";
+    const GREEN: &str = "\x1b[38;2;166;227;161m";
+    const NC: &str = "\x1b[0m";
+    const INFO_ICON: &str = "\u{f05a}"; //
+    const CHECK_ICON: &str = "\u{f00c}"; //
+
     // Path relative to src/keybinds/mod.rs where include_str! is called
     let default_path = "../../keybinds.toml";
 
@@ -18,8 +24,12 @@ pub fn load_keybinds_config() {
         let expanded_path = expand_tilde(&user_keybinds);
 
         if expanded_path.exists() {
-            println!(
-                "cargo:warning=Using user keybinds: {}",
+            eprintln!(
+                "{}{}  {}[keybinds] Using XDG config: {}{}",
+                GREEN,
+                CHECK_ICON,
+                NC,
+                BLUE,
                 expanded_path.display()
             );
             println!("cargo:rustc-env=KEYBINDS_FILE={}", expanded_path.display());
@@ -29,7 +39,10 @@ pub fn load_keybinds_config() {
     }
 
     // Fall back to default keybinds.toml
-    println!("cargo:warning=Using default keybinds: keybinds.toml");
+    eprintln!(
+        "{}{}  {}[keybinds] Using default config: keybinds.toml",
+        BLUE, INFO_ICON, NC
+    );
     println!("cargo:rustc-env=KEYBINDS_FILE={}", default_path);
     println!("cargo:rerun-if-changed=keybinds.toml");
 }

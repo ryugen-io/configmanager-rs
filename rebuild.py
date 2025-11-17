@@ -8,6 +8,7 @@ import sys
 import subprocess
 import time
 import argparse
+import os
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -17,6 +18,13 @@ sys.path.insert(0, str(REPO_ROOT / 'sys' / 'theme'))
 from theme import (  # noqa: E402
     Colors, Icons, log_success, log_error, log_warn, log_info
 )
+
+
+def get_build_env() -> dict:
+    """Get environment with verbose cargo build output enabled"""
+    env = os.environ.copy()
+    env['CARGO_BUILD_VERBOSE'] = '1'
+    return env
 
 
 def load_env_config(repo_root: Path) -> dict:
@@ -219,10 +227,10 @@ def build_backend(config: dict, skip_format: bool = False) -> bool:
     try:
         if use_auditable:
             subprocess.run(['cargo', 'auditable', 'build', '--bin', server_binary],
-                           cwd=REPO_ROOT, check=True)
+                           cwd=REPO_ROOT, check=True, env=get_build_env())
         else:
             subprocess.run(['cargo', 'build', '--bin', server_binary],
-                           cwd=REPO_ROOT, check=True)
+                           cwd=REPO_ROOT, check=True, env=get_build_env())
     except subprocess.CalledProcessError:
         log_error("Backend dev build failed")
         return False
@@ -231,10 +239,10 @@ def build_backend(config: dict, skip_format: bool = False) -> bool:
     try:
         if use_auditable:
             subprocess.run(['cargo', 'auditable', 'build', '--release', '--bin', server_binary],
-                           cwd=REPO_ROOT, check=True)
+                           cwd=REPO_ROOT, check=True, env=get_build_env())
         else:
             subprocess.run(['cargo', 'build', '--release', '--bin', server_binary],
-                           cwd=REPO_ROOT, check=True)
+                           cwd=REPO_ROOT, check=True, env=get_build_env())
     except subprocess.CalledProcessError:
         log_error("Backend release build failed")
         return False
@@ -270,14 +278,15 @@ def build_frontend(config: dict, skip_format: bool = False) -> bool:
     log_info("Building WASM frontend (release)...")
     try:
         subprocess.run(['trunk', 'build', '--release'], cwd=frontend_dir,
-                       check=True)
+                       check=True, env=get_build_env())
     except subprocess.CalledProcessError:
         log_error("Frontend release build failed")
         return False
 
     log_info("Building WASM frontend (dev)...")
     try:
-        subprocess.run(['trunk', 'build'], cwd=frontend_dir, check=True)
+        subprocess.run(['trunk', 'build'], cwd=frontend_dir, check=True,
+                       env=get_build_env())
     except subprocess.CalledProcessError:
         log_error("Frontend dev build failed")
         return False
