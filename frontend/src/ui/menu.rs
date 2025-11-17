@@ -12,7 +12,7 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Percentage(10),
-            Constraint::Length(40),
+            Constraint::Length(32),
             Constraint::Percentage(10),
         ])
         .split(area);
@@ -66,7 +66,6 @@ fn render_menu_center(f: &mut Frame, state: &AppState, area: Rect) {
     }
 
     // Add spacing
-    lines.push(Line::from(""));
     lines.push(Line::from(""));
 
     // Add menu items with icons

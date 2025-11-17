@@ -1,19 +1,5 @@
 use super::types::*;
 
-impl MenuKeybinds {
-    pub fn help_text(&self, global: &GlobalKeybinds) -> String {
-        format!(
-            "{},{}/{},{}:navigate {}:select {}:theme",
-            self.navigate_down,
-            self.navigate_down_alt,
-            self.navigate_up,
-            self.navigate_up_alt,
-            self.select,
-            global.cycle_theme
-        )
-    }
-}
-
 impl FileListKeybinds {
     pub fn help_text(&self, _global: &GlobalKeybinds) -> String {
         format!(
