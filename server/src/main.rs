@@ -13,6 +13,12 @@ use tower_http::services::ServeDir;
 async fn main() {
     println!("{}", version::version_string());
 
+    // Load environment variables from .sys/env/.env if it exists
+    if let Err(e) = dotenvy::from_filename(".sys/env/.env") {
+        eprintln!("Warning: Could not load .sys/env/.env: {}", e);
+        eprintln!("Using default configuration values");
+    }
+
     // Load configuration
     let app_config = match config::AppConfig::load() {
         Ok(cfg) => Arc::new(cfg),
@@ -48,9 +54,15 @@ async fn main() {
         // Static files (frontend)
         .nest_service("/", ServeDir::new("frontend/dist"));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    // Read server configuration from environment or use defaults
+    let server_host = std::env::var("SERVER_HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+    let server_port = std::env::var("SERVER_PORT").unwrap_or_else(|_| "3000".to_string());
+    let bind_addr = format!("0.0.0.0:{}", server_port);
+    let display_addr = format!("http://{}:{}", server_host, server_port);
 
-    println!("Server running on http://0.0.0.0:3000");
+    let listener = tokio::net::TcpListener::bind(&bind_addr).await.unwrap();
+
+    println!("Server running on {}", display_addr);
     println!("API endpoints:");
     println!("  GET  /api/configs");
     println!("  GET  /api/configs/*filename");
