@@ -288,11 +288,18 @@ just build-frontend
 ### Development Cycle
 
 1. **Make changes** to source code
-2. **Format code**: `just fmt` (or auto-format in `rebuild.py`)
-3. **Lint**: `just clippy` (check for warnings)
-4. **Build**: `just rebuild` or `./rebuild.py`
-5. **Test manually** via the web interface
-6. **Commit** with descriptive messages
+2. **Run pre-commit checks** (MANDATORY before committing):
+   ```bash
+   # Run ALL checks with --recursive to find all projects
+   ./sys/rust/rustfmt.py --recursive       # Format Rust code
+   ./sys/rust/clippy.py --recursive        # Lint Rust code
+   ./sys/rust/check.py --recursive         # Check Rust builds
+   ./sys/rust/test_rust.py --recursive     # Run Rust tests
+   python3 sys/utils/pylint.py --recursive # Lint Python code
+   ```
+3. **Build and test**: `./rebuild.py` (builds and starts server)
+4. **Test manually** via the web interface
+5. **Commit** with descriptive messages (ONLY after all checks pass)
 
 ### Server Lifecycle
 
