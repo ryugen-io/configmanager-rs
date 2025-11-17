@@ -10,9 +10,13 @@ use wasm_bindgen_futures::spawn_local;
 pub fn handle_keys(state: &mut AppState, state_rc: &Rc<RefCell<AppState>>, key_event: KeyEvent) {
     let keybinds = &state.keybinds.menu;
 
-    if super::key_matches(&key_event, &keybinds.navigate_down) {
+    if super::key_matches(&key_event, &keybinds.navigate_down)
+        || super::key_matches(&key_event, &keybinds.navigate_down_alt)
+    {
         state.menu.next();
-    } else if super::key_matches(&key_event, &keybinds.navigate_up) {
+    } else if super::key_matches(&key_event, &keybinds.navigate_up)
+        || super::key_matches(&key_event, &keybinds.navigate_up_alt)
+    {
         state.menu.previous();
     } else if super::key_matches(&key_event, &keybinds.select)
         && let Some(selected) = state.menu.selected()

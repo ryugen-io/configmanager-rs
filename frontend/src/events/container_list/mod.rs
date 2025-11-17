@@ -9,9 +9,13 @@ use std::{cell::RefCell, rc::Rc};
 pub fn handle_keys(state: &mut AppState, state_rc: &Rc<RefCell<AppState>>, key_event: KeyEvent) {
     let keybinds = &state.keybinds.container_list;
 
-    if super::key_matches(&key_event, &keybinds.navigate_down) {
+    if super::key_matches(&key_event, &keybinds.navigate_down)
+        || super::key_matches(&key_event, &keybinds.navigate_down_alt)
+    {
         navigation::next(state);
-    } else if super::key_matches(&key_event, &keybinds.navigate_up) {
+    } else if super::key_matches(&key_event, &keybinds.navigate_up)
+        || super::key_matches(&key_event, &keybinds.navigate_up_alt)
+    {
         navigation::previous(state);
     } else if super::key_matches(&key_event, &keybinds.start_container) {
         actions::start_container(state, state_rc);

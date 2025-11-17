@@ -11,14 +11,18 @@ pub struct Keybinds {
 #[derive(Deserialize)]
 pub struct MenuKeybinds {
     pub navigate_down: String,
+    pub navigate_down_alt: String,
     pub navigate_up: String,
+    pub navigate_up_alt: String,
     pub select: String,
 }
 
 #[derive(Deserialize)]
 pub struct FileListKeybinds {
     pub navigate_down: String,
+    pub navigate_down_alt: String,
     pub navigate_up: String,
+    pub navigate_up_alt: String,
     pub select: String,
     pub back_to_menu: String,
     pub go_to_editor: String,
@@ -27,7 +31,9 @@ pub struct FileListKeybinds {
 #[derive(Deserialize)]
 pub struct ContainerListKeybinds {
     pub navigate_down: String,
+    pub navigate_down_alt: String,
     pub navigate_up: String,
+    pub navigate_up_alt: String,
     pub start_container: String,
     pub stop_container: String,
     pub restart_container: String,

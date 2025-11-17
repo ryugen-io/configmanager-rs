@@ -2,19 +2,25 @@
 
 [menu]
 navigate_down = "j"
+navigate_down_alt = "Down"
 navigate_up = "k"
+navigate_up_alt = "Up"
 select = "Enter"
 
 [file_list]
 navigate_down = "j"
+navigate_down_alt = "Down"
 navigate_up = "k"
+navigate_up_alt = "Up"
 select = "Enter"
 back_to_menu = "Esc"
 go_to_editor = "Ctrl-Right"
 
 [container_list]
 navigate_down = "j"
+navigate_down_alt = "Down"
 navigate_up = "k"
+navigate_up_alt = "Up"
 start_container = "s"
 stop_container = "x"
 restart_container = "r"
