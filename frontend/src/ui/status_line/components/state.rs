@@ -18,12 +18,12 @@ pub fn render_vim_mode(state: &AppState, theme: &ThemeConfig) -> Option<Span<'st
 pub fn render_filename(state: &AppState, theme: &ThemeConfig) -> Option<Span<'static>> {
     if let Some(filename) = &state.editor.current_file {
         Some(Span::styled(
-            filename.clone(),
+            format!("{} ", filename),
             StatusLineTheme::filename_style(theme),
         ))
     } else {
         Some(Span::styled(
-            "No file",
+            "No file ",
             StatusLineTheme::no_file_style(theme),
         ))
     }
