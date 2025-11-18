@@ -86,6 +86,15 @@ impl AppState {
         if let Ok(theme) = crate::theme::load_theme_by_name(theme_name) {
             self.current_theme = theme;
             crate::theme::save_theme_preference(theme_name);
+
+            // Update DOM elements
+            if let Err(e) = crate::update_dom_for_theme(&self.current_theme) {
+                web_sys::console::error_1(&wasm_bindgen::JsValue::from_str(&format!(
+                    "Failed to update DOM for theme: {:?}",
+                    e
+                )));
+            }
+
             self.set_status(format!("Theme changed to: {}", theme_name));
         } else {
             self.set_status(format!("Theme '{}' not found", theme_name));

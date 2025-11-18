@@ -15,7 +15,7 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::{Document, window};
 
 /// Inject font configuration into the document
-fn inject_font(doc: &Document, font_config: &theme::FontConfig) -> Result<(), JsValue> {
+pub fn inject_font(doc: &Document, font_config: &theme::FontConfig) -> Result<(), JsValue> {
     let head = doc
         .head()
         .ok_or_else(|| JsValue::from_str("No head element found"))?;
@@ -49,6 +49,27 @@ fn inject_font(doc: &Document, font_config: &theme::FontConfig) -> Result<(), Js
         style.set_inner_html(&font_style);
         head.append_child(&style)?;
     }
+
+    Ok(())
+}
+
+/// Update DOM elements (background + font) for theme changes
+pub fn update_dom_for_theme(theme: &theme::ThemeConfig) -> Result<(), JsValue> {
+    let win = window().ok_or_else(|| JsValue::from_str("No window"))?;
+    let doc = win
+        .document()
+        .ok_or_else(|| JsValue::from_str("No document"))?;
+    let body = doc.body().ok_or_else(|| JsValue::from_str("No body"))?;
+
+    // Set background color
+    let mantle = theme.mantle();
+    if let ratzilla::ratatui::style::Color::Rgb(r, g, b) = mantle {
+        let bg_color = format!("rgb({}, {}, {})", r, g, b);
+        body.set_attribute("style", &format!("background-color: {}", bg_color))?;
+    }
+
+    // Inject font configuration
+    inject_font(&doc, &theme.font)?;
 
     Ok(())
 }
