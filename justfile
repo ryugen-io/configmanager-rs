@@ -91,6 +91,18 @@ venv:
 xdg-paths:
     python3 sys/utils/xdg_paths.py
 
+# Enable debug code
+debug-enable:
+    python3 sys/rust/debug.py enable
+
+# Disable debug code
+debug-disable:
+    python3 sys/rust/debug.py disable
+
+# Show debug status
+debug-status:
+    python3 sys/rust/debug.py status
+
 # HTML linting and validation
 htmllint:
     python3 sys/html/htmllint.py --recursive

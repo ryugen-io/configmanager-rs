@@ -8,7 +8,7 @@ pub fn available_themes() -> Vec<&'static str> {
 
 /// Load theme by name from embedded themes
 pub fn load_theme_by_name(name: &str) -> Result<ThemeConfig, String> {
-    // DEBUG: Uncomment for theme loading diagnostics
+    // [DEBUG_START] Theme loading diagnostics
     // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
     //     "[DEBUG] Available themes: {:?}",
     //     generated::THEME_NAMES
@@ -17,18 +17,20 @@ pub fn load_theme_by_name(name: &str) -> Result<ThemeConfig, String> {
     //     "[DEBUG] Trying to load theme: '{}'",
     //     name
     // )));
+    // [DEBUG_END]
 
     // Load theme content from auto-generated code
     // This is generated at build time by frontend/build_helpers/theme/generator.rs
     let toml_content = generated::load_theme_content(name)?;
 
-    // DEBUG: Uncomment for theme content diagnostics
+    // [DEBUG_START] Theme content diagnostics
     // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
     //     "[DEBUG] Successfully loaded theme content for '{}'",
     //     name
     // )));
+    // [DEBUG_END]
 
-    // DEBUG: Uncomment for theme parsing diagnostics
+    // [DEBUG_START] Theme parsing diagnostics
     // let parsed = parse_theme_toml(toml_content);
     // match &parsed {
     //     Ok(_) => web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
@@ -41,6 +43,7 @@ pub fn load_theme_by_name(name: &str) -> Result<ThemeConfig, String> {
     //     ))),
     // }
     // parsed
+    // [DEBUG_END]
 
     parse_theme_toml(toml_content)
 }

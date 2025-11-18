@@ -83,19 +83,21 @@ impl AppState {
     }
 
     pub fn set_theme(&mut self, theme_name: &str) {
-        // DEBUG: Uncomment for set_theme diagnostics
-        // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-        //     "[DEBUG] set_theme called with: '{}'",
-        //     theme_name
-        // )));
+        // [DEBUG_START] set_theme diagnostics
+        //     web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
+        //         "[DEBUG] set_theme called with: '{}'",
+        //         theme_name
+        //     )));
+        // [DEBUG_END]
 
         match crate::theme::load_theme_by_name(theme_name) {
             Ok(theme) => {
-                // DEBUG: Uncomment for successful theme load diagnostics
-                // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-                //     "[DEBUG] Theme '{}' loaded successfully in set_theme",
-                //     theme_name
-                // )));
+                // [DEBUG_START] Successful theme load diagnostics
+                //             web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
+                //                 "[DEBUG] Theme '{}' loaded successfully in set_theme",
+                //                 theme_name
+                //             )));
+                // [DEBUG_END]
 
                 self.current_theme = theme;
                 crate::theme::save_theme_preference(theme_name);
