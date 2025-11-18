@@ -43,10 +43,10 @@ pub fn render(f: &mut Frame, state: &AppState, area: Rect) {
             MenuTheme::normal_prefix()
         };
 
-        // Test: Einfachere Nerd Font Icons oder Unicode-Symbole
+        // Simple Unicode symbols (better browser compatibility than Nerd Fonts)
         let icon = match item.as_str() {
-            "Config Files" => "□ ", // Simple box drawing character
-            "Container" => "◆ ",    // Diamond symbol
+            "Config Files" => "□ ", // White square (U+25A1)
+            "Container" => "◆ ",    // Black diamond (U+25C6)
             _ => "",
         };
 
