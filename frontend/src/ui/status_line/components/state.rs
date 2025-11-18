@@ -12,18 +12,18 @@ pub fn render_vim_mode(state: &AppState, theme: &ThemeConfig) -> Option<Span<'st
 
     let mode_text = StatusLineTheme::mode_text(state.vim_mode);
     let mode_style = StatusLineTheme::mode_style(theme, state.vim_mode);
-    Some(Span::styled(format!(" {} ", mode_text), mode_style))
+    Some(Span::styled(mode_text.to_string(), mode_style))
 }
 
 pub fn render_filename(state: &AppState, theme: &ThemeConfig) -> Option<Span<'static>> {
     if let Some(filename) = &state.editor.current_file {
         Some(Span::styled(
-            format!("{} ", filename),
+            filename.clone(),
             StatusLineTheme::filename_style(theme),
         ))
     } else {
         Some(Span::styled(
-            "No file ",
+            "No file".to_string(),
             StatusLineTheme::no_file_style(theme),
         ))
     }
@@ -32,11 +32,14 @@ pub fn render_filename(state: &AppState, theme: &ThemeConfig) -> Option<Span<'st
 pub fn render_modified_indicator(state: &AppState, theme: &ThemeConfig) -> Option<Span<'static>> {
     if state.dirty {
         Some(Span::styled(
-            " [modified]",
+            "[modified]".to_string(),
             StatusLineTheme::modified_style(theme),
         ))
     } else {
-        Some(Span::styled(" [OK]", StatusLineTheme::ok_style(theme)))
+        Some(Span::styled(
+            "[OK]".to_string(),
+            StatusLineTheme::ok_style(theme),
+        ))
     }
 }
 
@@ -47,7 +50,7 @@ pub fn render_status_message(state: &AppState, theme: &ThemeConfig) -> Option<Sp
         } else {
             StatusLineTheme::status_message_style(theme)
         };
-        Some(Span::styled(format!(" {}", msg), style))
+        Some(Span::styled(msg.clone(), style))
     } else {
         None
     }

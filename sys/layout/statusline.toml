@@ -33,9 +33,12 @@ rows = [
 rows = [
     { components = [{ type = "spacer" }] },
     { components = [
+        { type = "text", value = " " },
         { type = "vim_mode" },
+        { type = "text", value = " " },
         { type = "separator", value = " | " },
         { type = "filename" },
+        { type = "text", value = " " },
         { type = "modified_indicator" },
         { type = "status_message" },
         { type = "separator", value = " | " },
@@ -71,9 +74,12 @@ rows = [
 rows = [
     { components = [{ type = "spacer" }] },
     { components = [
+        { type = "text", value = " " },
         { type = "vim_mode" },
+        { type = "text", value = " " },
         { type = "separator", value = " | " },
         { type = "filename" },
+        { type = "text", value = " " },
         { type = "modified_indicator" },
         { type = "status_message" },
         { type = "separator", value = " | " },
@@ -146,13 +152,17 @@ rows = [
 # - "spacer": Empty line (no content)
 # - "separator": Visual separator (requires "value" field, e.g., " | ")
 # - "text": Custom static text (requires "value" field and optional "style")
+#           Use this for spacing: { type = "text", value = " " }
 #
 # STATE-BASED COMPONENTS (from AppState):
-# - "vim_mode": NORMAL/INSERT indicator (only shows in FileList/Editor panes)
-# - "filename": Current file name (shows "No file" if none loaded)
-# - "modified_indicator": " [modified]" suffix (only shows if file is dirty)
-# - "status_message": Status/error messages (error messages get special styling)
-# - "help_text": Keybind help text (per-pane, excludes Menu pane)
+# NOTE: These components render WITHOUT leading/trailing spaces!
+#       Use { type = "text", value = " " } for spacing between components.
+#
+# - "vim_mode": NORMAL/INSERT indicator (no spaces, only shows in FileList/Editor)
+# - "filename": Current file name or "No file" (no spaces)
+# - "modified_indicator": [OK] or [modified] (no spaces, always visible)
+# - "status_message": Status/error messages (no spaces, error messages get special styling)
+# - "help_text": Keybind help text (no spaces, per-pane, excludes Menu pane)
 #
 # BUILD-TIME COMPONENTS (from env! macros):
 # - "build_date": Build timestamp (e.g., "2025-11-17 14:32:15")
