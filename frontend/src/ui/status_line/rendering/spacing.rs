@@ -19,9 +19,10 @@ pub fn render_row_with_spacing(
     let mut last_was_content = false;
     let mut is_first_component = true;
 
-    for component_config in &row_config.components {
+    for (idx, component_config) in row_config.components.iter().enumerate() {
         if let Some(span) = components::render_component(component_config, state, theme) {
             let is_spacing = is_spacing_component(component_config);
+            let is_closing_paren = is_closing_parenthesis(component_config);
 
             // Add leading space for first content component (alignment)
             // BUT: Don't add if the component already starts with a space
@@ -31,8 +32,8 @@ pub fn render_row_with_spacing(
             }
 
             // Add space before this component if last one was also content
-            // (but not for spacer/separator types which handle their own spacing)
-            if last_was_content && !is_spacing {
+            // EXCEPT: Don't add space before closing parentheses
+            if last_was_content && !is_spacing && !is_closing_paren {
                 spans.push(Span::raw(" "));
             }
 
@@ -61,6 +62,14 @@ fn is_spacing_component(component: &ComponentConfig) -> bool {
 fn starts_with_space(component: &ComponentConfig) -> bool {
     match component {
         ComponentConfig::Text { value, .. } => value.starts_with(' '),
+        _ => false,
+    }
+}
+
+/// Check if a component is a closing parenthesis (no space before it).
+fn is_closing_parenthesis(component: &ComponentConfig) -> bool {
+    match component {
+        ComponentConfig::Text { value, .. } => value.trim() == ")",
         _ => false,
     }
 }
