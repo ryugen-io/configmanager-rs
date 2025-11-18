@@ -103,7 +103,7 @@ def count_lines(filepath: Path) -> FileStats:
     return stats
 
 
-def scan_files(base_path: Path, types: List[str], recursive: bool, exclude_dirs: List[str]) -> List[Path]:
+def scan_files(base_path: Path, types: List[str], recursive: bool, exclude_dirs: List[str], exclude_files: List[str]) -> List[Path]:
     """Scan for files to analyze"""
     files = []
 
@@ -115,13 +115,23 @@ def scan_files(base_path: Path, types: List[str], recursive: bool, exclude_dirs:
             pattern = f'**/*.{ext}' if recursive else f'*.{ext}'
             matched_files = base_path.glob(pattern)
 
-            # Filter out excluded directories
+            # Filter out excluded directories and files
             for filepath in matched_files:
                 should_exclude = False
+
+                # Check excluded directories
                 for exclude_dir in exclude_dirs:
                     if exclude_dir in filepath.parts:
                         should_exclude = True
                         break
+
+                # Check excluded files
+                if not should_exclude:
+                    for exclude_file in exclude_files:
+                        if filepath.name == exclude_file:
+                            should_exclude = True
+                            break
+
                 if not should_exclude:
                     files.append(filepath)
 
@@ -185,8 +195,15 @@ Examples:
     parser.add_argument(
         '-e', '--exclude',
         nargs='+',
-        default=['target', '.git', 'node_modules', 'dist', '__pycache__', '.venv', 'venv'],
-        help='Directories to exclude from scanning (default: target .git node_modules dist __pycache__ .venv venv)'
+        default=['target', '.git', 'node_modules', 'dist', '__pycache__', '.venv', 'venv', 'sys'],
+        help='Directories to exclude from scanning (default: target .git node_modules dist __pycache__ .venv venv sys)'
+    )
+
+    parser.add_argument(
+        '--exclude-files',
+        nargs='+',
+        default=['rebuild.py', 'start.py', 'stop.py', 'status.py'],
+        help='Files to exclude from scanning (default: rebuild.py start.py stop.py status.py)'
     )
 
     parser.add_argument(
@@ -205,7 +222,7 @@ Examples:
         return 1
 
     # Scan files
-    files = scan_files(base_path, args.types, args.recursive, args.exclude)
+    files = scan_files(base_path, args.types, args.recursive, args.exclude, args.exclude_files)
 
     if not files:
         log_error(f"No files found matching types: {', '.join(args.types)}")
