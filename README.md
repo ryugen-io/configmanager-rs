@@ -4,7 +4,7 @@
 sysrat-rs/
 ├── .github/
 │   ├── logs/
-│   │   └── 20251118-151143-workflow.log
+│   │   └── 20251118-220406-workflow.log
 │   ├── skips/
 │   │   └── .skip.update-readme.example
 │   └── workflows/
@@ -19,13 +19,16 @@ sysrat-rs/
 │   │   ├── menu-text.ascii
 │   │   └── sysrat.ascii
 │   ├── build_helpers/
+│   │   ├── theme/
+│   │   │   ├── generator.rs
+│   │   │   ├── mod.rs
+│   │   │   └── scanner.rs
 │   │   ├── ascii.rs
 │   │   ├── date.rs
 │   │   ├── hash.rs
 │   │   ├── keybinds.rs
 │   │   ├── mod.rs
 │   │   ├── statusline.rs
-│   │   ├── theme.rs
 │   │   └── version.rs
 │   ├── src/
 │   │   ├── api/
@@ -123,10 +126,15 @@ sysrat-rs/
 │   │   ├── init.rs
 │   │   └── lib.rs
 │   ├── themes/
+│   │   ├── cyberpunk.toml
+│   │   ├── dracula.toml
 │   │   ├── frappe.toml
+│   │   ├── gruvbox-dark.toml
+│   │   ├── gruvbox-light.toml
 │   │   ├── latte.toml
 │   │   ├── macchiato.toml
-│   │   └── mocha.toml
+│   │   ├── mocha.toml
+│   │   └── synthwave.toml
 │   ├── build.rs
 │   ├── Cargo.toml
 │   ├── index.html
@@ -172,6 +180,7 @@ sysrat-rs/
 │   │   ├── check.py
 │   │   ├── clean.py
 │   │   ├── clippy.py
+│   │   ├── debug.py
 │   │   ├── rustfmt.py
 │   │   └── test_rust.py
 │   ├── theme/
@@ -190,6 +199,7 @@ sysrat-rs/
 ├── Cargo.lock
 ├── Cargo.toml
 ├── CLAUDE.md
+├── DEBUG.md
 ├── deny.toml
 ├── justfile
 ├── README.md
