@@ -4,7 +4,7 @@
 sysrat-rs/
 ├── .github/
 │   ├── logs/
-│   │   └── 20251118-140924-workflow.log
+│   │   └── 20251118-141539-workflow.log
 │   ├── skips/
 │   │   └── .skip.update-readme.example
 │   └── workflows/
@@ -75,6 +75,12 @@ sysrat-rs/
 │   │   │   ├── mod.rs
 │   │   │   └── types.rs
 │   │   ├── theme/
+│   │   │   ├── types/
+│   │   │   │   ├── colors.rs
+│   │   │   │   ├── config.rs
+│   │   │   │   ├── font.rs
+│   │   │   │   ├── icons.rs
+│   │   │   │   └── mod.rs
 │   │   │   ├── builder.rs
 │   │   │   ├── container_list.rs
 │   │   │   ├── editor.rs
@@ -82,8 +88,7 @@ sysrat-rs/
 │   │   │   ├── loader.rs
 │   │   │   ├── menu.rs
 │   │   │   ├── mod.rs
-│   │   │   ├── status_line.rs
-│   │   │   └── types.rs
+│   │   │   └── status_line.rs
 │   │   ├── ui/
 │   │   │   ├── container_details/
 │   │   │   │   ├── basic.rs
