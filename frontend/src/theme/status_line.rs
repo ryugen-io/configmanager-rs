@@ -33,6 +33,10 @@ impl StatusLineTheme {
         Style::default().fg(theme.modified())
     }
 
+    pub fn ok_style(theme: &ThemeConfig) -> Style {
+        Style::default().fg(theme.success())
+    }
+
     pub fn no_file_style(theme: &ThemeConfig) -> Style {
         theme.standard_label()
     }

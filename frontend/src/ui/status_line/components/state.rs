@@ -36,7 +36,7 @@ pub fn render_modified_indicator(state: &AppState, theme: &ThemeConfig) -> Optio
             StatusLineTheme::modified_style(theme),
         ))
     } else {
-        None
+        Some(Span::styled(" [OK]", StatusLineTheme::ok_style(theme)))
     }
 }
 
