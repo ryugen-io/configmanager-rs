@@ -23,10 +23,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -246,7 +243,7 @@ Examples:
     tag = f"{Colors.MAUVE}[remove-emojis]{Colors.NC}"
     print(f"\n{tag} {CLEAN}  Removing Unicode emojis from files...\n")
 
-    log_info(f"Processing {len(files)} file(s)")
+    log_info(f"Processing {len(files)} files")
     if not args.no_backup:
         log_info("Backups will be created with .emoji-backup extension")
     print()

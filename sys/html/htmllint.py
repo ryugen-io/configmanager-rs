@@ -21,10 +21,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -140,7 +137,7 @@ def filter_trunk_warnings(output: str) -> Tuple[str, bool]:
 
 def validate_html_w3c(html_files: List[Path]) -> bool:
     """Validate HTML using html5validator (W3C validator)"""
-    log_info(f"running W3C HTML validation on {len(html_files)} file(s)...")
+    log_info(f"running W3C HTML validation on {len(html_files)} files...")
 
     # Build file list
     file_args = [str(f) for f in html_files]
@@ -185,7 +182,7 @@ def run_htmllint(base_path: Path, recursive: bool, use_validator: bool) -> int:
         log_warn("No HTML files found")
         return 0
 
-    print(f"{Colors.TEXT}found {len(html_files)} HTML file(s){Colors.NC}")
+    print(f"{Colors.TEXT}found {len(html_files)} HTML files{Colors.NC}")
     for html_file in html_files:
         rel_path = html_file.relative_to(base_path)
         print(f"{Colors.SUBTEXT}  - {rel_path}{Colors.NC}")

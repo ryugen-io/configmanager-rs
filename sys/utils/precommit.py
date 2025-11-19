@@ -18,6 +18,26 @@ sys.path.insert(0, str(REPO_ROOT / 'sys' / 'theme'))
 from theme import Colors, Icons, log_success, log_error, log_warn, log_info
 
 
+def load_env_config(repo_root: Path) -> dict:
+    """Load configuration from sys/env/.env.dev file"""
+    env_file = repo_root / 'sys' / 'env' / '.env.dev'
+
+    if not env_file.exists():
+        raise FileNotFoundError(f"config not found: {env_file}")
+
+    config = {}
+    with open(env_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                # Remove quotes if present
+                value = value.strip('"').strip("'")
+                config[key] = value
+
+    return config
+
+
 class CheckResult:
     """Result of a single check"""
     def __init__(self, name: str, passed: bool, output: str = ""):
@@ -73,7 +93,7 @@ def extract_summary(output: str, check_name: str) -> str:
     # Look for summary indicators
     summary_keywords = [
         'all projects', 'all files', 'all checks', 'all tests',
-        'project(s)', 'file(s)', 'passed', 'failed', 'clean',
+        'project(s)', 'files', 'passed', 'failed', 'clean',
         'formatted', 'compiled', 'valid', 'issues'
     ]
 

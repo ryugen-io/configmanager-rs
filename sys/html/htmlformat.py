@@ -21,10 +21,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -81,7 +78,7 @@ def find_html_files(base_path: Path, recursive: bool) -> List[Path]:
 
 def format_html_prettier(html_files: List[Path], check_only: bool) -> bool:
     """Format HTML using prettier"""
-    log_info(f"formatting {len(html_files)} HTML file(s) with Prettier...")
+    log_info(f"formatting {len(html_files)} HTML files with Prettier...")
 
     file_args = [str(f) for f in html_files]
     cmd = ['npx', 'prettier', '--write' if not check_only else '--check'] + file_args
@@ -93,7 +90,7 @@ def format_html_prettier(html_files: List[Path], check_only: bool) -> bool:
             if check_only:
                 log_success("all html files are formatted correctly")
             else:
-                log_success("HTML files formatted successfully")
+                log_success("html files formatted")
             return True
         else:
             if check_only:
@@ -152,7 +149,7 @@ def run_htmlformat(base_path: Path, recursive: bool, check_only: bool) -> int:
         log_warn("No HTML files found")
         return 0
 
-    print(f"{Colors.TEXT}found {len(html_files)} HTML file(s){Colors.NC}")
+    print(f"{Colors.TEXT}found {len(html_files)} HTML files{Colors.NC}")
     for html_file in html_files:
         rel_path = html_file.relative_to(base_path)
         print(f"{Colors.SUBTEXT}  - {rel_path}{Colors.NC}")

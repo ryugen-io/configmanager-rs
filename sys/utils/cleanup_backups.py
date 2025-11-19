@@ -71,7 +71,7 @@ def main():
 
     # Display found files
     total_size = 0
-    log_info(f"found {len(backup_files)} backup file(s):\n")
+    log_info(f"found {len(backup_files)} backup files:\n")
 
     for i, backup_file in enumerate(backup_files, 1):
         size = backup_file.stat().st_size
@@ -113,7 +113,7 @@ def main():
                     log_error(f"Failed to delete {backup_file.name}: {e}")
 
             print()
-            log_success(f"Deleted {deleted_count} file(s), freed {format_size(deleted_size)}")
+            log_success(f"Deleted {deleted_count} files, freed {format_size(deleted_size)}")
         else:
             log_info("No files deleted")
 

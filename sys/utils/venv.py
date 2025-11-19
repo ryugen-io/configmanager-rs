@@ -24,10 +24,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -99,7 +96,7 @@ class VenvCreator:
 
             # Success
             print()
-            log_success(f"Virtual environment created successfully")
+            log_success("virtual environment created")
             print()
 
             # Update .env if custom venv name
@@ -127,121 +124,3 @@ class VenvCreator:
             return
 
         env_file = REPO_ROOT / self.config['SYS_DIR'] / 'env' / '.env'
-        if not env_file.exists():
-            return
-
-        try:
-            with open(env_file, 'r') as f:
-                lines = f.readlines()
-
-            updated = False
-            for i, line in enumerate(lines):
-                if line.strip().startswith('PYTHON_VENV_DEFAULT='):
-                    lines[i] = f'PYTHON_VENV_DEFAULT={venv_name}\n'
-                    updated = True
-                    break
-
-            if updated:
-                with open(env_file, 'w') as f:
-                    f.writelines(lines)
-                log_info(f"Updated .env: PYTHON_VENV_DEFAULT={venv_name}")
-                print()
-
-        except Exception as e:
-            log_warn(f"Could not update .env: {e}")
-            print()
-
-    def _show_activation_info(self, venv_path: Path, venv_name: str) -> None:
-        """Show activation instructions"""
-        print(f"{Colors.MAUVE}Activation{Colors.NC}")
-        print()
-
-        # Detect shell and show appropriate command
-        shell = Path(os.environ.get('SHELL', '/bin/bash')).name
-
-        if shell == 'fish':
-            activate_cmd = f"source {venv_name}/bin/activate.fish"
-        elif shell in ['zsh', 'bash', 'sh']:
-            activate_cmd = f"source {venv_name}/bin/activate"
-        else:
-            activate_cmd = f"source {venv_name}/bin/activate"
-
-        print(f"{Colors.TEXT}Activate:              {Colors.NC}{Colors.SAPPHIRE}{activate_cmd}{Colors.NC}")
-        print(f"{Colors.TEXT}Deactivate:            {Colors.NC}{Colors.SAPPHIRE}deactivate{Colors.NC}")
-        print()
-
-        # Additional info
-        print(f"{Colors.MAUVE}Next Steps{Colors.NC}")
-        print()
-        print(f"{Colors.TEXT}1. Activate the venv:  {Colors.NC}{Colors.SAPPHIRE}{activate_cmd}{Colors.NC}")
-        print(f"{Colors.TEXT}2. Upgrade pip:        {Colors.NC}{Colors.SAPPHIRE}pip install --upgrade pip{Colors.NC}")
-        print(f"{Colors.TEXT}3. Install packages:   {Colors.NC}{Colors.SAPPHIRE}pip install <package>{Colors.NC}")
-        print()
-
-
-def main():
-    """Main function"""
-    import argparse
-    import os
-
-    parser = argparse.ArgumentParser(
-        description='Python virtual environment creator - creates and configures Python venvs',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='''
-Examples:
-  # Create .venv in current directory (interactive)
-  python3 venv.py
-
-  # Create venv with specific name
-  python3 venv.py --name myenv
-
-  # Create venv in specific directory
-  python3 venv.py --path /path/to/project
-
-  # Create venv with name and path
-  python3 venv.py --path /path/to/project --name myenv
-
-  # Non-interactive mode (uses default .venv)
-  python3 venv.py --no-interactive
-        '''
-    )
-
-    parser.add_argument(
-        '-p', '--path',
-        type=str,
-        default='.',
-        help='Target directory for venv creation (default: current directory)'
-    )
-
-    parser.add_argument(
-        '-n', '--name',
-        type=str,
-        default='.venv',
-        help='Virtual environment name (default: .venv)'
-    )
-
-    parser.add_argument(
-        '--no-interactive',
-        action='store_true',
-        help='Non-interactive mode - use defaults without prompting'
-    )
-
-    args = parser.parse_args()
-
-    target_dir = Path(args.path)
-
-    # Validate target directory
-    if not target_dir.exists():
-        log_error(f"Target directory not found: {target_dir}")
-        return 1
-
-    if not target_dir.is_dir():
-        log_error(f"Target path is not a directory: {target_dir}")
-        return 1
-
-    creator = VenvCreator()
-    return creator.create_venv(target_dir, args.name, not args.no_interactive)
-
-
-if __name__ == '__main__':
-    sys.exit(main())

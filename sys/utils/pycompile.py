@@ -24,10 +24,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -120,7 +117,7 @@ class PyCompileChecker:
             log_error("No Python files found")
             return 1
 
-        log_info(f"checking {len(files)} Python file(s)")
+        log_info(f"checking {len(files)} Python files")
         print()
 
         for filepath in files:

@@ -22,10 +22,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -287,7 +284,7 @@ Examples:
     mode = "Preview mode" if args.dry_run else "Fixing Nerd Font icons"
     print(f"\n{tag} {mode}...\n")
 
-    log_info(f"Processing {len(files)} file(s)")
+    log_info(f"Processing {len(files)} files")
     if args.dry_run:
         log_warn("DRY RUN - No files will be modified")
     print()

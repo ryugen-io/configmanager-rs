@@ -23,10 +23,7 @@ def load_env_config(repo_root: Path) -> dict:
     env_file = repo_root / 'sys' / 'env' / '.env.dev'
 
     if not env_file.exists():
-        raise FileNotFoundError(
-            f"Development configuration file not found: {env_file}\n"
-            f"Create sys/env/.env.dev for development tool configuration."
-        )
+        raise FileNotFoundError(f"config not found: {env_file}")
 
     config = {}
     with open(env_file, 'r') as f:
@@ -231,7 +228,7 @@ Examples:
     print()
     print(f"{Colors.MAUVE}[lines]{Colors.NC} {Colors.BLUE}{Icons.CHART}{Colors.NC} Analyzing lines of code...")
     print()
-    log_info(f"Processing {len(files)} file(s) with limit: {args.limit} lines")
+    log_info(f"Processing {len(files)} files with limit: {args.limit} lines")
     print()
 
     # Analyze files
@@ -308,7 +305,7 @@ Examples:
 
     # Check if we have files over the limit
     if over_limit > 0:
-        log_warn(f"{over_limit} file(s) exceed {args.limit} lines")
+        log_warn(f"{over_limit} files exceed {args.limit} lines")
     else:
         log_success(f"All files under {args.limit} lines!")
 
