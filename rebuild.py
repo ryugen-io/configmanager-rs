@@ -104,7 +104,7 @@ def check_requirements(config: dict) -> bool:
         print()
         return False
 
-    log_success("All required tools are available")
+    log_success("requirements met")
     return True
 
 
@@ -248,7 +248,7 @@ def build_backend(config: dict, skip_format: bool = False) -> bool:
         return False
 
     print()
-    log_success("Backend build successful")
+    log_success("backend built")
     return True
 
 
@@ -292,7 +292,7 @@ def build_frontend(config: dict, skip_format: bool = False) -> bool:
         return False
 
     print()
-    log_success("Frontend build successful")
+    log_success("frontend built")
     return True
 
 
@@ -353,7 +353,7 @@ def start_server(config: dict) -> bool:
     for attempt in range(max_attempts):
         if check_port(port):
             print()
-            log_success(f"Server running (PID: {server_pid})")
+            log_success(f"server running (pid: {server_pid})")
             print()
             log_info(f"URL: {Colors.SAPPHIRE}http://{config['SERVER_HOST']}:"
                      f"{port}{Colors.NC}")
@@ -406,7 +406,7 @@ def main():
 
     print()
     print(f"{Colors.MAUVE}[rebuild]{Colors.NC} {Icons.HAMMER}  "
-          f"Starting build process for {config['DISPLAY_NAME']}...")
+          f"building {config['DISPLAY_NAME']}...")
     print()
 
     if not check_requirements(config):
@@ -431,7 +431,7 @@ def main():
             sys.exit(1)
 
     print()
-    log_success("Build complete")
+    log_success("build complete")
     print()
 
     if not args.no_server:

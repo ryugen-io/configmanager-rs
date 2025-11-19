@@ -16,13 +16,13 @@ pub(super) async fn execute_container_action(
         .map_err(|_| {
             (
                 StatusCode::REQUEST_TIMEOUT,
-                format!("Docker {} timed out after 120 seconds", action),
+                format!("docker {} timed out", action),
             )
         })?
         .map_err(|e| {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to execute docker {}: {}", action, e),
+                format!("docker {} failed: {}", action, e),
             )
         })?;
 
@@ -30,12 +30,19 @@ pub(super) async fn execute_container_action(
         let error = String::from_utf8_lossy(&output.stderr);
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Docker {} failed: {}", action, error),
+            format!("docker {} failed: {}", action, error),
         ));
     }
 
+    let past_tense = match action {
+        "start" => "started",
+        "stop" => "stopped",
+        "restart" => "restarted",
+        _ => action,
+    };
+
     Ok(Json(ContainerActionResponse {
         success: true,
-        message: format!("Container {} successful", action),
+        message: format!("container {}", past_tense),
     }))
 }

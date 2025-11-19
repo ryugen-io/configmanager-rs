@@ -133,13 +133,13 @@ def main():
 
     if server_stopped:
         print()
-        log_success(f"{display_name} stopped successfully")
+        log_success(f"{display_name} stopped")
     else:
-        log_warn("Server may still be running")
-        log_info(f"Check with: ps aux | grep {server_binary}")
+        log_warn("server may still be running")
+        log_info(f"check with: ps aux | grep {server_binary}")
 
     print()
-    print(f" {Colors.RED}{Icons.STOP}{Colors.NC}  Done.")
+    print(f" {Colors.RED}{Icons.STOP}{Colors.NC}  done")
     print()
 
 

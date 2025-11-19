@@ -299,10 +299,10 @@ Available tools: flake8, pylint, mypy
     print()
 
     if total_issues == 0:
-        log_success("All Python files passed linting!")
+        log_success("all python files passed")
         return 0
     else:
-        log_error("Some files have critical issues")
+        log_error("linting failed")
         return 1
 
 

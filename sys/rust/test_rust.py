@@ -233,10 +233,10 @@ Examples:
     print()
 
     if failed_tests > 0 or failed_run > 0:
-        log_error("Some tests failed")
+        log_error("tests failed")
         return 1
     else:
-        log_success("All tests passed!")
+        log_success("all tests passed")
         return 0
 
 

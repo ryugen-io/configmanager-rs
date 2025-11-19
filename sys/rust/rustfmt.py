@@ -248,17 +248,17 @@ Examples:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to format")
+        log_error("formatting failed")
         return 1
     elif formatted > 0:
         if args.check:
-            log_warn("Some projects need formatting")
+            log_warn("formatting needed")
             return 1
         else:
-            log_success("All projects formatted successfully!")
+            log_success("all projects formatted")
             return 0
     else:
-        log_success("All projects already formatted correctly!")
+        log_success("already formatted")
         return 0
 
 

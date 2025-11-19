@@ -115,10 +115,10 @@ def lint_project(project_path: Path, deny_warnings: bool = True) -> int:
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - No issues found")
+            log_success(f"  {project_name} - clean")
             return 0
         else:
-            log_warn(f"  {project_name} - Issues found")
+            log_warn(f"  {project_name} - issues found")
             if result.stdout:
                 print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
             if result.stderr:
@@ -177,7 +177,7 @@ Examples:
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[clippy]{Colors.NC} {Icons.WARN}  Rust Linter")
+    print(f"{Colors.MAUVE}[clippy]{Colors.NC} {Icons.WARN}  rust linter")
     print()
 
     if not check_cargo():
@@ -237,13 +237,13 @@ Examples:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to lint")
+        log_error("linting failed")
         return 1
     elif warnings > 0:
-        log_warn("Some projects have linting issues")
+        log_warn("linting issues found")
         return 1
     else:
-        log_success("All projects passed linting!")
+        log_success("all projects clean")
         return 0
 
 

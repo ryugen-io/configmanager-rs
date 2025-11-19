@@ -209,8 +209,8 @@ class DebugToggler:
 
     def toggle_all(self, enable: bool):
         """Toggle debug code in all files"""
-        action = "Enabling" if enable else "Disabling"
-        print(f"{Colors.MAUVE}[debug-toggle]{Colors.NC} {action} debug code...")
+        action = "enabling" if enable else "disabling"
+        print(f"{Colors.MAUVE}[debug]{Colors.NC} {action} debug code")
         print()
 
         # Find all files with debug markers
@@ -249,16 +249,16 @@ class DebugToggler:
         print()
 
         if self.stats['lines_toggled'] > 0:
-            print(f"{Colors.GREEN}{Icons.CHECK}  {Colors.NC}Debug code {action.lower()} successfully!")
+            print(f"{Colors.GREEN}{Icons.CHECK}  {Colors.NC}debug code {action.lower()}")
             if enable:
-                print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}Remember to rebuild: {Colors.BLUE}./rebuild.py{Colors.NC}")
+                print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}rebuild required: {Colors.BLUE}./rebuild.py{Colors.NC}")
         else:
-            print(f"{Colors.BLUE}{Icons.INFO}  {Colors.NC}No changes needed")
+            print(f"{Colors.BLUE}{Icons.INFO}  {Colors.NC}no changes needed")
 
 
 def show_status(repo_root: Path):
     """Show current debug status"""
-    print(f"{Colors.MAUVE}[debug-status]{Colors.NC} Checking debug code status...")
+    print(f"{Colors.MAUVE}[debug]{Colors.NC} checking status")
     print()
 
     toggler = DebugToggler(repo_root)
@@ -295,7 +295,7 @@ def show_status(repo_root: Path):
 
 def print_usage():
     """Print usage information"""
-    print(f"{Colors.MAUVE}[debug-toggle]{Colors.NC} Debug Code Toggle Script")
+    print(f"{Colors.MAUVE}[debug]{Colors.NC} debug code toggle")
     print()
     print("Usage:")
     print(f"  {Colors.BLUE}python3 sys/rust/debug.py enable{Colors.NC}   - Enable debug code")

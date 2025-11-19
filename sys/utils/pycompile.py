@@ -142,7 +142,7 @@ class PyCompileChecker:
             log_error("Compilation check failed")
             return 1
         else:
-            log_success("All files compiled successfully!")
+            log_success("all files compiled")
             return 0
 
 

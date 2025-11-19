@@ -260,13 +260,13 @@ About cargo-auditable:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to audit")
+        log_error("audit failed")
         return 1
     elif warnings > 0:
-        log_warn("Some projects have warnings")
+        log_warn("audit warnings found")
         return 0
     else:
-        log_success("All projects passed audit!")
+        log_success("all projects passed")
         return 0
 
 

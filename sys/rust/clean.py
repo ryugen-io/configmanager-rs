@@ -239,13 +239,13 @@ Examples:
     print()
 
     if failed > 0:
-        log_error("Some projects failed to clean")
+        log_error("cleaning failed")
         return 1
     else:
         if args.dry_run:
-            log_success("Dry run complete!")
+            log_success("dry run complete")
         else:
-            log_success("All projects cleaned successfully!")
+            log_success("all projects cleaned")
         return 0
 
 

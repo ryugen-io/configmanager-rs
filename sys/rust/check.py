@@ -219,10 +219,10 @@ Examples:
     print()
 
     if failed > 0 or errors > 0:
-        log_error("Some projects failed checks")
+        log_error("checks failed")
         return 1
     else:
-        log_success("All projects passed checks!")
+        log_success("all checks passed")
         return 0
 
 
