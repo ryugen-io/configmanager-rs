@@ -10,12 +10,12 @@ pub fn available_themes() -> Vec<&'static str> {
 pub fn load_theme_by_name(name: &str) -> Result<ThemeConfig, String> {
     // [DEBUG_START] Theme loading diagnostics
     // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-    //     "[DEBUG] Available themes: {:?}",
-    //     generated::THEME_NAMES
+        // "[DEBUG] Available themes: {:?}",
+        // generated::THEME_NAMES
     // )));
     // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-    //     "[DEBUG] Trying to load theme: '{}'",
-    //     name
+        // "[DEBUG] Trying to load theme: '{}'",
+        // name
     // )));
     // [DEBUG_END]
 
@@ -25,22 +25,22 @@ pub fn load_theme_by_name(name: &str) -> Result<ThemeConfig, String> {
 
     // [DEBUG_START] Theme content diagnostics
     // web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-    //     "[DEBUG] Successfully loaded theme content for '{}'",
-    //     name
+        // "[DEBUG] Successfully loaded theme content for '{}'",
+        // name
     // )));
     // [DEBUG_END]
 
     // [DEBUG_START] Theme parsing diagnostics
     // let parsed = parse_theme_toml(toml_content);
     // match &parsed {
-    //     Ok(_) => web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
-    //         "[DEBUG] Successfully parsed theme '{}'",
-    //         name
-    //     ))),
-    //     Err(e) => web_sys::console::error_1(&wasm_bindgen::JsValue::from_str(&format!(
-    //         "[DEBUG] Failed to parse theme '{}': {}",
-    //         name, e
-    //     ))),
+        // Ok(_) => web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!(
+            // "[DEBUG] Successfully parsed theme '{}'",
+            // name
+        // ))),
+        // Err(e) => web_sys::console::error_1(&wasm_bindgen::JsValue::from_str(&format!(
+            // "[DEBUG] Failed to parse theme '{}': {}",
+            // name, e
+        // ))),
     // }
     // parsed
     // [DEBUG_END]
