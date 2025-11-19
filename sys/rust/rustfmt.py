@@ -183,7 +183,7 @@ Examples:
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[rustfmt]{Colors.NC} {Icons.HAMMER}  Rust Code Formatter")
+    print(f"{Colors.MAUVE}[rustfmt]{Colors.NC} {Icons.HAMMER}  rust code formatter")
     print()
 
     if args.check:

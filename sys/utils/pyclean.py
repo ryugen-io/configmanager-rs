@@ -106,7 +106,7 @@ class PyCacheCleaner:
     def run(self, base_path: Path, dry_run: bool) -> int:
         """Run cache cleaner"""
         print()
-        print(f"{Colors.MAUVE}[pyclean]{Colors.NC} {Icons.CLEAN}  Python Cache Cleaner")
+        print(f"{Colors.MAUVE}[pyclean]{Colors.NC} {Icons.CLEAN}  python cache cleaner")
         print()
 
         if dry_run:
@@ -124,8 +124,8 @@ class PyCacheCleaner:
             log_success("No cache directories found - nothing to clean")
             return 0
 
-        log_info(f"Found {len(self.pycache_dirs)} __pycache__ director{'y' if len(self.pycache_dirs) == 1 else 'ies'}")
-        log_info(f"Found {len(self.mypy_cache_dirs)} .mypy_cache director{'y' if len(self.mypy_cache_dirs) == 1 else 'ies'}")
+        log_info(f"found {len(self.pycache_dirs)} __pycache__ director{'y' if len(self.pycache_dirs) == 1 else 'ies'}")
+        log_info(f"found {len(self.mypy_cache_dirs)} .mypy_cache director{'y' if len(self.mypy_cache_dirs) == 1 else 'ies'}")
         print()
 
         self.remove_caches(dry_run)

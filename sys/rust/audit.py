@@ -198,7 +198,7 @@ About cargo-auditable:
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[audit]{Colors.NC} {Icons.INFO}  Rust Security Audit (cargo auditable)")
+    print(f"{Colors.MAUVE}[audit]{Colors.NC} {Icons.INFO}  rust security audit (cargo auditable)")
     print()
 
     if not check_cargo():

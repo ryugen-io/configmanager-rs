@@ -176,7 +176,7 @@ Examples:
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[test]{Colors.NC} {Icons.ROCKET}  Rust Test Runner")
+    print(f"{Colors.MAUVE}[test]{Colors.NC} {Icons.ROCKET}  rust test runner")
     print()
 
     if not check_cargo():

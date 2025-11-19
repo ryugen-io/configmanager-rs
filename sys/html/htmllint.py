@@ -140,7 +140,7 @@ def filter_trunk_warnings(output: str) -> Tuple[str, bool]:
 
 def validate_html_w3c(html_files: List[Path]) -> bool:
     """Validate HTML using html5validator (W3C validator)"""
-    log_info(f"Running W3C HTML validation on {len(html_files)} file(s)...")
+    log_info(f"running W3C HTML validation on {len(html_files)} file(s)...")
 
     # Build file list
     file_args = [str(f) for f in html_files]
@@ -156,7 +156,7 @@ def validate_html_w3c(html_files: List[Path]) -> bool:
         filtered_output, has_real_errors = filter_trunk_warnings(result.stdout)
 
         if result.returncode == 0 or not has_real_errors:
-            log_success("All HTML files are valid")
+            log_success("all html files are valid")
             return True
         else:
             log_error("HTML validation failed")
@@ -175,7 +175,7 @@ def validate_html_w3c(html_files: List[Path]) -> bool:
 
 def run_htmllint(base_path: Path, recursive: bool, use_validator: bool) -> int:
     """Run HTML linting"""
-    print(f"{Colors.MAUVE}[htmllint]{Colors.NC} HTML Linting")
+    print(f"{Colors.MAUVE}[htmllint]{Colors.NC} html linting")
     print()
 
     # Find HTML files
@@ -185,7 +185,7 @@ def run_htmllint(base_path: Path, recursive: bool, use_validator: bool) -> int:
         log_warn("No HTML files found")
         return 0
 
-    print(f"{Colors.TEXT}Found {len(html_files)} HTML file(s){Colors.NC}")
+    print(f"{Colors.TEXT}found {len(html_files)} HTML file(s){Colors.NC}")
     for html_file in html_files:
         rel_path = html_file.relative_to(base_path)
         print(f"{Colors.SUBTEXT}  - {rel_path}{Colors.NC}")
@@ -197,7 +197,7 @@ def run_htmllint(base_path: Path, recursive: bool, use_validator: bool) -> int:
         return 0 if success else 1
 
     # Fall back to basic validation
-    log_info("Running basic HTML syntax checks...")
+    log_info("running basic HTML syntax checks...")
     print()
 
     all_valid = True
@@ -214,7 +214,7 @@ def run_htmllint(base_path: Path, recursive: bool, use_validator: bool) -> int:
 
     print()
     if all_valid:
-        log_success("All HTML files passed basic validation")
+        log_success("all html files passed basic validation")
         return 0
     else:
         log_error("Some HTML files have validation errors")

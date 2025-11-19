@@ -71,7 +71,7 @@ def main():
 
     # Display found files
     total_size = 0
-    log_info(f"Found {len(backup_files)} backup file(s):\n")
+    log_info(f"found {len(backup_files)} backup file(s):\n")
 
     for i, backup_file in enumerate(backup_files, 1):
         size = backup_file.stat().st_size

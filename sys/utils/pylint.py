@@ -117,7 +117,7 @@ def lint_file(filepath: Path, tools: List[str]) -> Tuple[bool, int]:
     """
     issues = 0
 
-    print(f"{Colors.BLUE}Checking {Colors.NC}{filepath}")
+    print(f"{Colors.BLUE}checking {Colors.NC}{filepath}")
 
     # 1. Syntax check (always run)
     passed, error = check_syntax(filepath)
@@ -239,7 +239,7 @@ Available tools: flake8, pylint, mypy
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[pylint]{Colors.NC} Python Linter")
+    print(f"{Colors.MAUVE}[pylint]{Colors.NC} python linter")
     print()
 
     # Check which tools are available
@@ -269,7 +269,7 @@ Available tools: flake8, pylint, mypy
         log_error("No Python files found")
         return 1
 
-    log_info(f"Checking {len(files)} file(s)")
+    log_info(f"checking {len(files)} file(s)")
     print()
 
     # Lint files

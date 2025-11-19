@@ -162,7 +162,7 @@ Examples:
     args = parser.parse_args()
 
     print()
-    print(f"{Colors.MAUVE}[check]{Colors.NC} {Icons.CHECK}  Rust Build Checker")
+    print(f"{Colors.MAUVE}[check]{Colors.NC} {Icons.CHECK}  rust build checker")
     print()
 
     if not check_cargo():

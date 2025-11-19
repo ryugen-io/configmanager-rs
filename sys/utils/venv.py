@@ -63,7 +63,7 @@ class VenvCreator:
     def create_venv(self, target_dir: Path, venv_name: str, interactive: bool) -> int:
         """Create virtual environment"""
         print()
-        print(f"{Colors.MAUVE}[venv]{Colors.NC} {Icons.ROCKET}  Python Virtual Environment Creator")
+        print(f"{Colors.MAUVE}[venv]{Colors.NC} {Icons.ROCKET}  python virtual environment creator")
         print()
 
         # Prompt for name if interactive and no name provided

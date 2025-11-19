@@ -109,7 +109,7 @@ class PyCompileChecker:
     def run(self, base_path: Path, recursive: bool) -> int:
         """Run compilation checker"""
         print()
-        print(f"{Colors.MAUVE}[pycompile]{Colors.NC} {Icons.FILE}  Python Compilation Checker")
+        print(f"{Colors.MAUVE}[pycompile]{Colors.NC} {Icons.FILE}  python compilation checker")
         print()
         log_info("Validating Python syntax by compiling to bytecode")
         print()
@@ -120,7 +120,7 @@ class PyCompileChecker:
             log_error("No Python files found")
             return 1
 
-        log_info(f"Checking {len(files)} Python file(s)")
+        log_info(f"checking {len(files)} Python file(s)")
         print()
 
         for filepath in files:

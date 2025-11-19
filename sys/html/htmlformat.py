@@ -81,7 +81,7 @@ def find_html_files(base_path: Path, recursive: bool) -> List[Path]:
 
 def format_html_prettier(html_files: List[Path], check_only: bool) -> bool:
     """Format HTML using prettier"""
-    log_info(f"Formatting {len(html_files)} HTML file(s) with Prettier...")
+    log_info(f"formatting {len(html_files)} HTML file(s) with Prettier...")
 
     file_args = [str(f) for f in html_files]
     cmd = ['npx', 'prettier', '--write' if not check_only else '--check'] + file_args
@@ -91,7 +91,7 @@ def format_html_prettier(html_files: List[Path], check_only: bool) -> bool:
 
         if result.returncode == 0:
             if check_only:
-                log_success("All HTML files are formatted correctly")
+                log_success("all html files are formatted correctly")
             else:
                 log_success("HTML files formatted successfully")
             return True
@@ -142,7 +142,7 @@ def format_html_manual(html_files: List[Path]) -> bool:
 
 def run_htmlformat(base_path: Path, recursive: bool, check_only: bool) -> int:
     """Run HTML formatting"""
-    print(f"{Colors.MAUVE}[htmlformat]{Colors.NC} HTML Formatting")
+    print(f"{Colors.MAUVE}[htmlformat]{Colors.NC} html formatting")
     print()
 
     # Find HTML files
@@ -152,7 +152,7 @@ def run_htmlformat(base_path: Path, recursive: bool, check_only: bool) -> int:
         log_warn("No HTML files found")
         return 0
 
-    print(f"{Colors.TEXT}Found {len(html_files)} HTML file(s){Colors.NC}")
+    print(f"{Colors.TEXT}found {len(html_files)} HTML file(s){Colors.NC}")
     for html_file in html_files:
         rel_path = html_file.relative_to(base_path)
         print(f"{Colors.SUBTEXT}  - {rel_path}{Colors.NC}")

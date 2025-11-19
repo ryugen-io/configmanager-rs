@@ -418,6 +418,8 @@ def main():
     stop_servers(config)
 
     print()
+    print(f"{Colors.SUBTEXT}{'─' * 40}{Colors.NC}")
+    print()
 
     build_backend_flag = not args.frontend_only
     build_frontend_flag = not args.backend_only
@@ -425,12 +427,17 @@ def main():
     if build_backend_flag:
         if not build_backend(config, args.skip_format):
             sys.exit(1)
+        print()
+        print(f"{Colors.SUBTEXT}{'─' * 40}{Colors.NC}")
+        print()
 
     if build_frontend_flag:
         if not build_frontend(config, args.skip_format):
             sys.exit(1)
+        print()
+        print(f"{Colors.SUBTEXT}{'─' * 40}{Colors.NC}")
+        print()
 
-    print()
     log_success("build complete")
     print()
 
