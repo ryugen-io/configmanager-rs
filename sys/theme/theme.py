@@ -52,24 +52,24 @@ class Icons:
 
 
 def log_success(msg: str):
-    """Log success message with icon"""
-    print(f"{Colors.GREEN}{Icons.CHECK}  {Colors.NC}{msg}")
+    """Log success message with [tag]"""
+    print(f"[success] {Colors.GREEN}{Icons.CHECK}  {Colors.NC}{msg}")
 
 
 def log_error(msg: str):
-    """Log error message with icon"""
+    """Log error message with [tag]"""
     import sys
-    print(f"{Colors.RED}{Icons.CROSS}  {Colors.NC}{msg}", file=sys.stderr)
+    print(f"[error] {Colors.RED}{Icons.CROSS}  {Colors.NC}{msg}", file=sys.stderr)
 
 
 def log_warn(msg: str):
-    """Log warning message with icon"""
-    print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}{msg}")
+    """Log warning message with [tag]"""
+    print(f"[warn] {Colors.YELLOW}{Icons.WARN}  {Colors.NC}{msg}")
 
 
 def log_info(msg: str):
-    """Log info message with icon"""
-    print(f"{Colors.BLUE}{Icons.INFO}  {Colors.NC}{msg}")
+    """Log info message with [tag]"""
+    print(f"[info] {Colors.BLUE}{Icons.INFO}  {Colors.NC}{msg}")
 
 
 def log_header(msg: str):
