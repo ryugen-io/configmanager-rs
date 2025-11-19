@@ -100,10 +100,10 @@ def check_project(project_path: Path, all_targets: bool = False) -> int:
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - Check passed")
+            log_success(f"  {project_name} - check passed")
             return 0
         else:
-            log_error(f"  {project_name} - Check failed")
+            log_error(f"  {project_name} - check failed")
             if result.stdout:
                 print(f"{Colors.YELLOW}{result.stdout.strip()}{Colors.NC}")
             if result.stderr:
@@ -169,7 +169,7 @@ Examples:
         return 1
 
     version = get_cargo_version()
-    log_info(f"Using {version}")
+    log_info(f"using {version}")
     print()
 
     base_path = Path(args.path)
@@ -181,10 +181,10 @@ Examples:
     projects = find_cargo_projects(base_path, args.recursive)
 
     if not projects:
-        log_error("No Rust projects found (no Cargo.toml)")
+        log_error("no rust projects found (no Cargo.toml)")
         return 1
 
-    log_info(f"Found {len(projects)} Rust project(s)")
+    log_info(f"found {len(projects)} rust project(s)")
     print()
 
     passed = 0
@@ -208,13 +208,13 @@ Examples:
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
     if passed > 0:
-        print(f"{Colors.GREEN}Passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
+        print(f"{Colors.GREEN}passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
 
     if errors > 0:
         print(f"{Colors.YELLOW}Errors:              {Colors.NC}{Colors.SAPPHIRE}{errors}{Colors.NC}")
 
     if failed > 0:
-        print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
+        print(f"{Colors.RED}failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
 
     print()
 

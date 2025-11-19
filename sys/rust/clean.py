@@ -200,10 +200,10 @@ Examples:
     projects = find_cargo_projects(base_path, args.recursive)
 
     if not projects:
-        log_error("No Rust projects found (no Cargo.toml)")
+        log_error("no rust projects found (no Cargo.toml)")
         return 1
 
-    log_info(f"Found {len(projects)} Rust project(s)")
+    log_info(f"found {len(projects)} rust project(s)")
     print()
 
     cleaned = 0
@@ -230,7 +230,7 @@ Examples:
         print(f"{Colors.GREEN}{action}:           {Colors.NC}{Colors.SAPPHIRE}{cleaned}{Colors.NC}")
 
     if failed > 0:
-        print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
+        print(f"{Colors.RED}failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
 
     if total_freed > 0:
         action = "Would free" if args.dry_run else "Freed"

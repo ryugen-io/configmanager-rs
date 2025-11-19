@@ -103,7 +103,7 @@ def test_project(project_path: Path, verbose: bool = False, nocapture: bool = Fa
         )
 
         if result.returncode == 0:
-            log_success(f"  {project_name} - All tests passed")
+            log_success(f"  {project_name} - all tests passed")
             if verbose and result.stdout:
                 print(f"{Colors.TEXT}{result.stdout.strip()}{Colors.NC}")
             return 0
@@ -183,7 +183,7 @@ Examples:
         return 1
 
     version = get_cargo_version()
-    log_info(f"Using {version}")
+    log_info(f"using {version}")
     print()
 
     base_path = Path(args.path)
@@ -195,10 +195,10 @@ Examples:
     projects = find_cargo_projects(base_path, args.recursive)
 
     if not projects:
-        log_error("No Rust projects found (no Cargo.toml)")
+        log_error("no rust projects found (no Cargo.toml)")
         return 1
 
-    log_info(f"Found {len(projects)} Rust project(s)")
+    log_info(f"found {len(projects)} rust project(s)")
     print()
 
     passed = 0
@@ -222,7 +222,7 @@ Examples:
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
     if passed > 0:
-        print(f"{Colors.GREEN}Passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
+        print(f"{Colors.GREEN}passed:              {Colors.NC}{Colors.SAPPHIRE}{passed}{Colors.NC}")
 
     if failed_tests > 0:
         print(f"{Colors.YELLOW}Failed tests:        {Colors.NC}{Colors.SAPPHIRE}{failed_tests}{Colors.NC}")

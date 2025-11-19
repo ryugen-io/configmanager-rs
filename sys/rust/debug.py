@@ -217,7 +217,7 @@ class DebugToggler:
         debug_files = self.find_debug_files()
 
         if not debug_files:
-            print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}No debug markers found in project")
+            print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}no debug markers found in project")
             return
 
         print(f"{Colors.BLUE}{Icons.INFO}  {Colors.NC}Found {len(debug_files)} files with debug markers")
@@ -265,7 +265,7 @@ def show_status(repo_root: Path):
     debug_files = toggler.find_debug_files()
 
     if not debug_files:
-        print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}No debug markers found in project")
+        print(f"{Colors.YELLOW}{Icons.WARN}  {Colors.NC}no debug markers found in project")
         return
 
     print(f"{Colors.BLUE}{Icons.INFO}  {Colors.NC}Found {len(debug_files)} files with debug markers:")

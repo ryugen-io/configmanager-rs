@@ -119,7 +119,7 @@ def format_project(project_path: Path, check_mode: bool = False) -> int:
                 print(f"  {Colors.TEXT}{project_name}{Colors.NC} {Colors.SAPPHIRE}(already formatted){Colors.NC}")
                 return 1
             else:
-                log_success(f"  Formatted {project_name}")
+                log_success(f"  {project_name} - formatted")
                 return 0
         else:
             if check_mode:
@@ -197,7 +197,7 @@ Examples:
         return 1
 
     version = get_rustfmt_version()
-    log_info(f"Using {version}")
+    log_info(f"using {version}")
     print()
 
     base_path = Path(args.path)
@@ -209,10 +209,10 @@ Examples:
     projects = find_cargo_projects(base_path, args.recursive)
 
     if not projects:
-        log_error("No Rust projects found (no Cargo.toml)")
+        log_error("no rust projects found (no Cargo.toml)")
         return 1
 
-    log_info(f"Found {len(projects)} Rust project(s)")
+    log_info(f"found {len(projects)} rust project(s)")
     print()
 
     formatted = 0
@@ -236,14 +236,14 @@ Examples:
     print(f"{Colors.TEXT}Total projects:      {Colors.NC}{Colors.SAPPHIRE}{total}{Colors.NC}")
 
     if formatted > 0:
-        action = "Need formatting" if args.check else "Formatted"
+        action = "need formatting" if args.check else "formatted"
         print(f"{Colors.GREEN}{action}:         {Colors.NC}{Colors.SAPPHIRE}{formatted}{Colors.NC}")
 
     if unchanged > 0:
-        print(f"{Colors.TEXT}Already formatted:   {Colors.NC}{Colors.SAPPHIRE}{unchanged}{Colors.NC}")
+        print(f"{Colors.TEXT}already formatted:   {Colors.NC}{Colors.SAPPHIRE}{unchanged}{Colors.NC}")
 
     if failed > 0:
-        print(f"{Colors.RED}Failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
+        print(f"{Colors.RED}failed:              {Colors.NC}{Colors.SAPPHIRE}{failed}{Colors.NC}")
 
     print()
 
